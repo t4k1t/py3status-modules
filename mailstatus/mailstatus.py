@@ -1,15 +1,33 @@
 #!/usr/bin/env python
 
-"""mailstatus is an email module for py3status.
+"""mailstatus
+
+Mailstatus is an email module for py3status.
 It operates in two modes:
     'unread' mode: show number of unread mails
     'subject' mode: show subject of first unread email; on right click show
         subject of next unread mail
+
+Copyright (C) 2013  Tablet Mode
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see [http://www.gnu.org/licenses/].
 """
 
-from time import time
-from mailbox import Maildir, NoSuchMailboxError
 from email.header import decode_header
+from mailbox import Maildir, NoSuchMailboxError
+from sys import stderr
+from time import time
 
 class _Data:
     """Aquire data."""
@@ -44,10 +62,11 @@ class _Data:
             try:
                 mboxes.append(Maildir(mdir, create=False))
             except NoSuchMailboxError:
-                print("\n%s doesn't appear to be a mailbox.\n" % mdir)
+                stderr.write("\nmailstatus: %s doesn't appear to be a " \
+                        "mailbox.\n" % mdir)
                 exit(1)
 
-        return mboxes
+        self.mboxes = mboxes
 
     def get_unread(self):
         """Return number of unread emails and a list containing the respective
@@ -55,9 +74,8 @@ class _Data:
         """
         unread = 0
         subjects = []
-        mboxes = self.read_maildirs()
 
-        for mbox in mboxes:
+        for mbox in self.mboxes:
             for message in mbox:
                 flags = message.get_flags()
                 subject = message['subject']
@@ -77,6 +95,8 @@ class _Data:
 class Py3status:
 
     def __init__(self):
+        self.data = _Data()
+        self.data.read_maildirs()
         self.status = 'unread'
         self.currentSub = 0
 
@@ -89,16 +109,15 @@ class Py3status:
             else:
                 self.status = 'unread'
         # On right click increase index of subject list by one. This controls
-        # wich subject will be shown in 'subject' mode:
+        # which subject will be shown in 'subject' mode:
         if event['button'] == 3:
             if self.status == 'subject':
                 self.currentSub += 1
 
     def mailstatus(self, json, i3status_config):
         """Return response for i3status bar."""
-        data = _Data()
         response = {'full_text': '', 'name': 'mailinfo'}
-        unread, subjects = data.get_unread()
+        unread, subjects = self.data.get_unread()
 
         if self.status == 'unread':
             if unread > 0:
