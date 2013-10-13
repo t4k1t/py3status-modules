@@ -91,9 +91,10 @@ class Py3status:
         # On right click increase index of subject list by one. This controls
         # wich subject will be shown in 'subject' mode:
         if event['button'] == 3:
-            self.currentSub += 1
+            if self.status == 'subject':
+                self.currentSub += 1
 
-    def mailinfo(self, json, i3status_config):
+    def mailstatus(self, json, i3status_config):
         """Return response for i3status bar."""
         data = _Data()
         response = {'full_text': '', 'name': 'mailinfo'}
