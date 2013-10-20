@@ -1,0 +1,10 @@
+[mailstatus]
+#title = '✉' # slightly fancier title
+order = 0
+interval = 0
+#mailboxes = '/path/to/mailbox' '/path/to/another/mailbox'
+
+[taskstatus]
+#title = '✓'
+order = 1
+interval = 120
