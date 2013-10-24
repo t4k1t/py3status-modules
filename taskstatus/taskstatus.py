@@ -5,7 +5,7 @@
 Taskstatus is a taskwarrior module for py3status.
 It shows the number of open tasks in your py3status bar.
 
-Copyright (C) 2013 Tablet Mode
+Copyright (C) 2013 Tablet Mode <tablet-mode AT monochromatic DOT cc>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

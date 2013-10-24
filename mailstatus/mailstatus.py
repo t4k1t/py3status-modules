@@ -8,7 +8,7 @@ It operates in two modes:
     'subject' mode: show subject of first unread email; on right click show
         subject of next unread mail
 
-Copyright (C) 2013 Tablet Mode
+Copyright (C) 2013 Tablet Mode <tablet-mode AT monochromatic DOT cc>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

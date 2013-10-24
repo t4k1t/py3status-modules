@@ -8,3 +8,10 @@ interval = 0
 #title = '✓'
 order = 1
 interval = 120
+
+[mpdstatus]
+title = 'MPD:'
+order = 2
+interval = 0
+#host = 'localhost'
+#port = 6600
