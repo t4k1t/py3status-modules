@@ -101,7 +101,7 @@ class Py3status:
 
     def mpdstatus(self, json, i3status_config):
         response = {'full_text': '', 'name': 'mpdstatus'}
-        
+
         if self.connection:
             artist, title, state = self.data.get_stats()
 
