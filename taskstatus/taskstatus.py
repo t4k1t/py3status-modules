@@ -88,13 +88,13 @@ class Py3status:
 
         tasks, overdue = self.data.get_tasks()
 
-        if tasks > 0:
-            response['full_text'] = "%s %d" % \
-                (self.data.TITLE, tasks)
         if overdue > 0:
             response['color'] = i3status_config['color_bad']
             response['full_text'] = "%s %d/%d" % \
                 (self.data.TITLE, overdue, tasks)
+        else:
+            response['full_text'] = "%s %d" % \
+                (self.data.TITLE, tasks)
 
         response['cached_until'] = time() + self.data.INTERVAL
 
