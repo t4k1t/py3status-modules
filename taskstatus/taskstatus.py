@@ -75,7 +75,7 @@ class Py3status:
     def __init__(self):
         # check if taskwarrior is installed
         try:
-            check_output(["task", ""], stderr=STDOUT)
+            check_output(["task", "--version"], stderr=STDOUT)
         except OSError:
             stderr.write("\ntaskwarrior: failed to execute 'task'")
             exit(1)
