@@ -37,7 +37,7 @@ class _Data:
         """
         config = SafeConfigParser({'title': 'TASK:', 'order': '0',
             'interval': '0'})
-        config.read([path.expanduser('~/.i3/py3status/modules.cfg')])
+        config.read([path.expanduser('~/.i3/py3status/modules.ini')])
         try:
             self.TITLE = split(config.get('taskstatus', 'title'))[0]
             self.ORDER = config.getint('taskstatus', 'order')

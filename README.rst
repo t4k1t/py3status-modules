@@ -26,20 +26,20 @@ modules
 configuration
 =============
 
-You can configure each module in `~/.i3/py3status/modules.cfg`::
+You can configure each module in `~/.i3/py3status/modules.ini`::
 
     [mailstatus]
-    # title
-    #title = '✉' # slightly fancier title
-    # where to put module output (can be between stock i3status ones)
+    ; title
+    ;title = '✉'
+    ; where to put module output (can be between stock i3status ones)
     order = 0
-    # refresh interval in seconds
+    ; refresh interval in seconds
     interval = 0
-    # list of mailboxes in quotes, separated by whitespace
-    #mailboxes = '/path/to/mailbox' '/path/to/another/mailbox'
+    ; list of mailboxes in quotes, separated by whitespace
+    ;mailboxes = '/path/to/mailbox' '/path/to/another/mailbox'
 
     [taskstatus]
-    #title = '✓'
+    ;title = '✓'
     order = 1
     interval = 120
 
@@ -47,7 +47,7 @@ You can configure each module in `~/.i3/py3status/modules.cfg`::
     title = 'MPD:'
     order = 2
     interval = 0
-    #host = 'localhost'
-    #port = 6600
+    ;host = 'localhost'
+    ;port = 6600
 
 .. _Taskwarrior: http://taskwarrior.org/

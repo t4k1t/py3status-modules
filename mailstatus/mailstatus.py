@@ -42,7 +42,7 @@ class _Data:
         mailboxes = []
         config = SafeConfigParser({'title': 'MAIL:', 'order': '0',
             'interval': '0'})
-        config.read([path.expanduser('~/.i3/py3status/modules.cfg')])
+        config.read([path.expanduser('~/.i3/py3status/modules.ini')])
         try:
             mailboxes = split(config.get('mailstatus', 'mailboxes'))
             self.TITLE = split(config.get('mailstatus', 'title'))[0]
