@@ -29,37 +29,40 @@ from shlex import split
 from sys import stderr
 from time import time
 
-class _Data:
+class Data:
     """Aquire data."""
 
-    def read_config(self):
-        """Read config file.
-        Exit on invalid config.
-        """
-        config = SafeConfigParser({'title': 'MPD:', 'order': '0',
-            'interval': '0', 'host': 'localhost', 'port': '6600'})
-        config.read([path.expanduser('~/.i3/py3status/modules.cfg')])
-        try:
-            self.TITLE = split(config.get('mpdstatus', 'title'))[0]
-            self.ORDER = config.getint('mpdstatus', 'order')
-            self.INTERVAL = config.getint('mpdstatus', 'interval')
-            self.HOST = split(config.get('mpdstatus', 'host'))[0]
-            self.PORT = config.getint('mpdstatus', 'port')
-        except NoSectionError:
-            stderr.write("\nmpdstatus: no mpdstatus section in config.\n\n")
-            self.TITLE = split(config.get('DEFAULT', 'title'))[0]
-            self.ORDER = config.getint('DEFAULT', 'order')
-            self.INTERVAL = config.getint('DEFAULT', 'interval')
-            self.HOST = split(config.get('DEFAULT', 'host'))[0]
-            self.PORT = config.getint('DEFAULT', 'port')
-
-    def connect(self):
-        """Connect to MPD Server."""
+    def __init__(self, config):
+        self.count = 0
+        conf = config
+        self.HOST = conf['host']
+        self.PORT = conf['port']
         self.client = MPDClient()
+        self._connect()
+
+    def _connect(self):
+        """Connect to MPD Server."""
         try:
             self.client.connect(self.HOST, self.PORT)
         except:
-            stderr.write("\nmpdstatus: couldn't connect to mpd.\n\n")
+            stderr.write("\nmpdstatus: couldn't connect to %s at port %d.\n\n"
+                    % (self.HOST, self.PORT))
+
+    def disconnect(self):
+        try:
+            self.client.close()
+            self.client.disconnect()
+        except:
+            pass
+
+    def reconnect(self):
+        self.disconnect()
+        self._connect()
+
+    def has_connection(self):
+        try:
+            self.client.status()
+        except:
             return False
         else:
             return True
@@ -77,7 +80,6 @@ class _Data:
         """Return Artist, Songtitle and Playback State."""
         song = self.client.currentsong()
         status = self.client.status()
-
         artist = song['artist']
 
         return artist, song['title'], status['state']
@@ -86,9 +88,35 @@ class _Data:
 class Py3status:
 
     def __init__(self):
-        self.data = _Data()
-        self.data.read_config()
-        self.connection = self.data.connect()
+        self.conf = self._read_config()
+        self.data = Data(self.conf)
+
+    def _read_config(self):
+        """Read config file.
+        Exit on invalid config.
+        """
+        conf = {}
+        config = SafeConfigParser({'title': 'MPD:', 'order': '0',
+            'interval': '0', 'host': 'localhost', 'port': '6600'})
+        config.read([path.expanduser('~/.i3/py3status/modules.ini')])
+        try:
+            conf['title'] = split(config.get('mpdstatus', 'title'))[0]
+            conf['order'] = config.getint('mpdstatus', 'order')
+            conf['interval'] = config.getint('mpdstatus', 'interval')
+            conf['host'] = split(config.get('mpdstatus', 'host'))[0]
+            conf['port'] = config.getint('mpdstatus', 'port')
+        except NoSectionError:
+            stderr.write("\nmpdstatus: no mpdstatus section in config.\n\n")
+            conf['title'] = split(config.get('DEFAULT', 'title'))[0]
+            conf['order'] = config.getint('DEFAULT', 'order')
+            conf['interval'] = config.getint('DEFAULT', 'interval')
+            conf['host'] = split(config.get('DEFAULT', 'host'))[0]
+            conf['port'] = config.getint('DEFAULT', 'port')
+
+        return conf
+
+    def kill(self, json, i3status_config, event):
+        self.data.disconnect()
 
     def on_click(self, json, i3status_config, event):
         """Handle mouse clicks."""
@@ -101,8 +129,9 @@ class Py3status:
 
     def mpdstatus(self, json, i3status_config):
         response = {'full_text': '', 'name': 'mpdstatus'}
+        connection = self.data.has_connection()
 
-        if self.connection:
+        if connection:
             artist, title, state = self.data.get_stats()
 
             if state == 'play':
@@ -111,11 +140,12 @@ class Py3status:
                 response['color'] = i3status_config['color_degraded']
 
             response['full_text'] = "%s %s - %s" % \
-                    (self.data.TITLE, artist, title)
+                    (self.conf['title'], artist, title)
         else:
+            self.data.reconnect()
             response['color'] = i3status_config['color_bad']
-            response['full_text'] = "%s not connected" % (self.data.TITLE)
+            response['full_text'] = "%s not connected" % (self.conf['title'])
 
-        response['cached_until'] = time() + self.data.INTERVAL
+        response['cached_until'] = time() + self.conf['interval']
 
-        return (self.data.ORDER, response)
+        return (self.conf['order'], response)
