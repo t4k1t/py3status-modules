@@ -18,9 +18,9 @@ modules
 - taskstatus shows open Taskwarrior_ tasks. If you have overdue tasks it also
   displays the number of overdue tasks and changes color.
 
-- mpdstatus shows the currently playing song. Left click will go to the
-  previous song, right click will jump to the next song and middle click will
-  pause playback
+- mpdstatus connects to MPD_ and shows the currently playing song. Left click
+  will go to the previous song, right click will jump to the next song and
+  middle click will pause playback.
 
 
 configuration
@@ -29,7 +29,6 @@ configuration
 You can configure each module in `~/.i3/py3status/modules.ini`::
 
     [mailstatus]
-    ; title
     ;title = '✉'
     ; where to put module output (can be between stock i3status ones)
     order = 0
@@ -44,10 +43,11 @@ You can configure each module in `~/.i3/py3status/modules.ini`::
     interval = 120
 
     [mpdstatus]
-    title = 'MPD:'
+    ;title = '♬'
     order = 2
     interval = 0
     ;host = 'localhost'
     ;port = 6600
 
+.. _MPD: http://www.musicpd.org/
 .. _Taskwarrior: http://taskwarrior.org/

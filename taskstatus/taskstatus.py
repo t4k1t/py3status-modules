@@ -19,6 +19,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 """
 
 from configparser import SafeConfigParser, NoSectionError, NoOptionError
@@ -28,25 +29,8 @@ from subprocess import check_output, CalledProcessError, STDOUT
 from sys import stderr
 from time import time
 
-class _Data:
+class Data:
     """Aquire data."""
-
-    def read_config(self):
-        """Read config file.
-        Exit on invalid config.
-        """
-        config = SafeConfigParser({'title': 'TASK:', 'order': '0',
-            'interval': '0'})
-        config.read([path.expanduser('~/.i3/py3status/modules.ini')])
-        try:
-            self.TITLE = split(config.get('taskstatus', 'title'))[0]
-            self.ORDER = config.getint('taskstatus', 'order')
-            self.INTERVAL = config.getint('taskstatus', 'interval')
-        except NoSectionError:
-            stderr.write("\ntaskstatus: no taskstatus section in config\n\n")
-            self.TITLE = split(config.get('DEFAULT', 'title'))[0]
-            self.ORDER = config.getint('DEFAULT', 'order')
-            self.INTERVAL = config.getint('DEFAULT', 'interval')
 
     def get_tasks(self):
         """Return number of overdue tasks and number of open tasks."""
@@ -73,17 +57,38 @@ class Py3status:
     """Called by py3status."""
 
     def __init__(self):
-        # check if taskwarrior is installed
+        """See if we can find taskwarrior."""
         try:
             check_output(["task", "--version"], stderr=STDOUT)
         except OSError:
             stderr.write("\ntaskwarrior: failed to execute 'task'")
             exit(1)
-        self.data = _Data()
-        self.data.read_config()
+        self.conf = self._read_config()
+        self.data = Data()
+
+    def _read_config(self):
+        """Read config file."""
+        conf = {}
+        config = SafeConfigParser({'title':'TASK:', 'order':'0',
+            'interval':'0'})
+        config.read([path.expanduser('~/.i3/py3status/modules.ini')])
+        try:
+            conf['title'] = split(config.get('taskstatus', 'title'))[0]
+            conf['order'] = config.getint('taskstatus', 'order')
+            conf['interval'] = config.getint('taskstatus', 'interval')
+        except NoSectionError:
+            stderr.write("\ntaskstatus: no taskstatus section in config\n\n")
+            conf['title'] = split(config.get('DEFAULT', 'title'))[0]
+            conf['order'] = config.getint('DEFAULT', 'order')
+            conf['interval'] = config.getint('DEFAULT', 'interval')
+
+        return conf
 
     def taskstatus(self, json, i3status_config):
         """Return response for py3status."""
+        TITLE = self.conf['title']
+        INTERVAL = self.conf['interval']
+        ORDER = self.conf['order']
         response = {'full_text': '', 'name': 'taskstatus'}
 
         tasks, overdue = self.data.get_tasks()
@@ -91,11 +96,11 @@ class Py3status:
         if overdue > 0:
             response['color'] = i3status_config['color_bad']
             response['full_text'] = "%s %d/%d" % \
-                (self.data.TITLE, overdue, tasks)
+                (TITLE, overdue, tasks)
         else:
             response['full_text'] = "%s %d" % \
-                (self.data.TITLE, tasks)
+                (TITLE, tasks)
 
-        response['cached_until'] = time() + self.data.INTERVAL
+        response['cached_until'] = time() + INTERVAL
 
-        return (self.data.ORDER, response)
+        return (ORDER, response)

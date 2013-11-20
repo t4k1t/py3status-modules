@@ -22,6 +22,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 """
 
 from configparser import SafeConfigParser, NoSectionError, NoOptionError
@@ -32,31 +33,11 @@ from shlex import split
 from sys import stderr
 from time import time
 
-class _Data:
+class Data:
     """Aquire data."""
 
-    def read_config(self):
-        """Read config file.
-        Exit on invalid config.
-        """
-        mailboxes = []
-        config = SafeConfigParser({'title': 'MAIL:', 'order': '0',
-            'interval': '0'})
-        config.read([path.expanduser('~/.i3/py3status/modules.ini')])
-        try:
-            mailboxes = split(config.get('mailstatus', 'mailboxes'))
-            self.TITLE = split(config.get('mailstatus', 'title'))[0]
-            self.ORDER = config.getint('mailstatus', 'order')
-            self.INTERVAL = config.getint('mailstatus', 'interval')
-        except NoSectionError:
-            stderr.write("\nmailstatus: no mailstatus section in config\n\n")
-            self.TITLE = split(config.get('DEFAULT', 'title'))[0]
-            self.ORDER = config.getint('DEFAULT', 'order')
-            self.INTERVAL = config.getint('DEFAULT', 'interval')
-        except NoOptionError:
-            stderr.write("\nmailstatus: no mailboxes configured\n\n")
-
-        self.MAILBOXES = mailboxes
+    def __init__(self, mailboxes):
+        self.read_mailboxes(mailboxes)
 
     def decode_subject(self, subject):
         """Return decoded subject line."""
@@ -72,13 +53,14 @@ class _Data:
 
         return decodedSub
 
-    def read_mailboxes(self):
+    def read_mailboxes(self, mailboxes):
         """Return list of mailboxes.
         Exit on invalid mailbox.
+
         """
         mboxes = []
-        if self.MAILBOXES:
-            for mdir in self.MAILBOXES:
+        if mailboxes:
+            for mdir in mailboxes:
                 try:
                     mboxes.append(Maildir(mdir, create=False))
                 except NoSuchMailboxError:
@@ -90,6 +72,7 @@ class _Data:
     def get_unread(self):
         """Return number of unread emails and a list containing the respective
         subjects.
+
         """
         unread = 0
         subjects = []
@@ -116,11 +99,33 @@ class _Data:
 class Py3status:
 
     def __init__(self):
-        self.data = _Data()
-        self.data.read_config()
-        self.data.read_mailboxes()
+        self.conf = self._read_config()
+        self.data = Data(self.conf['mailboxes'])
         self.status = 'unread'
         self.currentSub = 0
+
+    def _read_config(self):
+        """Read config file."""
+        conf = {}
+        config = SafeConfigParser({'title':'MAIL:', 'order':'0',
+            'interval':'0'})
+        config.read([path.expanduser('~/.i3/py3status/modules.ini')])
+
+        try:
+            conf['mailboxes'] = split(config.get('mailstatus', 'mailboxes'))
+            conf['title'] = split(config.get('mailstatus', 'title'))[0]
+            conf['order'] = config.getint('mailstatus', 'order')
+            conf['interval'] = config.getint('mailstatus', 'interval')
+        except NoSectionError:
+            stderr.write("\nmailstatus: no mailstatus section in config\n\n")
+            conf['mailboxes'] = False
+            conf['title'] = split(config.get('DEFAULT', 'title'))[0]
+            conf['order'] = config.getint('DEFAULT', 'order')
+            conf['interval'] = config.getint('DEFAULT', 'interval')
+        except NoOptionError:
+            stderr.write("\nmailstatus: no mailboxes configured\n\n")
+
+        return conf
 
     def on_click(self, json, i3status_config, event):
         """Handle mouse clicks."""
@@ -138,26 +143,30 @@ class Py3status:
 
     def mailstatus(self, json, i3status_config):
         """Return response for i3status bar."""
+        title = self.conf['title']
+        interval = self.conf['interval']
+        order = self.conf['order']
         response = {'full_text': '', 'name': 'mailstatus'}
         unread, subjects = self.data.get_unread()
 
         if isinstance(unread, str):
             response['color'] = i3status_config['color_bad']
             response['full_text'] = "%s %s" % \
-                    (self.data.TITLE, unread)
+                    (title, unread)
         elif self.status == 'unread':
             if unread > 0:
                 response['color'] = i3status_config['color_degraded']
             response['full_text'] = "%s %d" % \
-                    (self.data.TITLE, unread)
+                    (title, unread)
         else:
             # Carry over index of subject list:
             if self.currentSub >= len(subjects):
                 self.currentSub = 0
             response['full_text'] = "%s %d: %s" % \
-                    (self.data.TITLE, self.currentSub, \
+                    (title, self.currentSub, \
                     subjects[self.currentSub])
 
-        response['cached_until'] = time() + self.data.INTERVAL
+        response['cached_until'] = time() + interval
 
-        return (self.data.ORDER, response)
+        return (order, response)
+
