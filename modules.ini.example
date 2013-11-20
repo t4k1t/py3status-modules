@@ -1,17 +1,20 @@
 [mailstatus]
-#title = '✉' # slightly fancier title
+;title = '✉'
+; where to put module output (can be between stock i3status ones)
 order = 0
+; refresh interval in seconds
 interval = 0
-#mailboxes = '/path/to/mailbox' '/path/to/another/mailbox'
+; list of mailboxes in quotes, separated by whitespace
+;mailboxes = '/path/to/mailbox' '/path/to/another/mailbox'
 
 [taskstatus]
-#title = '✓'
+;title = '✓'
 order = 1
 interval = 120
 
 [mpdstatus]
-title = 'MPD:'
+;title = '♬'
 order = 2
 interval = 0
-#host = 'localhost'
-#port = 6600
+;host = 'localhost'
+;port = 6600
