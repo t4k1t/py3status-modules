@@ -2,7 +2,7 @@
 py3status-modules
 =================
 
-Collection of modules for py3status.
+Collection of modules for py3status_.
 
 These modules will need python3 to work.
 
@@ -50,4 +50,5 @@ You can configure each module in `~/.i3/py3status/modules.ini`::
     ;port = 6600
 
 .. _MPD: http://www.musicpd.org/
+.. _py3status: https://github.com/ultrabug/py3status
 .. _Taskwarrior: http://taskwarrior.org/
