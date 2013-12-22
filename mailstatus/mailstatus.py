@@ -30,8 +30,8 @@ from email.header import decode_header
 from mailbox import Maildir, NoSuchMailboxError
 from os import path
 from shlex import split
-from sys import stderr
 from time import time
+
 
 class Data:
     """Aquire data."""
@@ -43,7 +43,7 @@ class Data:
         """Return decoded subject line."""
         decodedSub = ''
         for sub, enc in decode_header(subject):
-            if enc == None:
+            if enc is None:
                 if isinstance(sub, str):
                     decodedSub += sub
                 else:
@@ -64,8 +64,8 @@ class Data:
                 try:
                     mboxes.append(Maildir(mdir, create=False))
                 except NoSuchMailboxError:
-                    stderr.write("\nmailstatus: %s doesn't appear to be a " \
-                            "mailbox.\n" % mdir)
+                    raise Exception(
+                        "mailstatus: %s doesn't appear to be a mailbox" % mdir)
                     exit(1)
         self.mboxes = mboxes
 
@@ -83,8 +83,6 @@ class Data:
             for message in mbox:
                 flags = message.get_flags()
                 subject = message['subject']
-
-                status = ""
 
                 if not subject:
                     subject = "no subject"
@@ -107,8 +105,8 @@ class Py3status:
     def _read_config(self):
         """Read config file."""
         conf = {}
-        config = SafeConfigParser({'title':'MAIL:', 'order':'0',
-            'interval':'0'})
+        config = SafeConfigParser({
+            'title': 'MAIL:', 'order': '0', 'interval': '0'})
         config.read([path.expanduser('~/.i3/py3status/modules.ini')])
 
         try:
@@ -117,13 +115,13 @@ class Py3status:
             conf['order'] = config.getint('mailstatus', 'order')
             conf['interval'] = config.getint('mailstatus', 'interval')
         except NoSectionError:
-            stderr.write("\nmailstatus: no mailstatus section in config\n\n")
+            raise Exception("mailstatus: no mailstatus section in config")
             conf['mailboxes'] = False
             conf['title'] = split(config.get('DEFAULT', 'title'))[0]
             conf['order'] = config.getint('DEFAULT', 'order')
             conf['interval'] = config.getint('DEFAULT', 'interval')
         except NoOptionError:
-            stderr.write("\nmailstatus: no mailboxes configured\n\n")
+            raise Exception("mailstatus: no mailboxes configured")
 
         return conf
 
@@ -151,22 +149,20 @@ class Py3status:
 
         if isinstance(unread, str):
             response['color'] = i3status_config['color_bad']
-            response['full_text'] = "%s %s" % \
-                    (title, unread)
+            response['full_text'] = "%s %s" % (
+                title, unread)
         elif self.status == 'unread':
             if unread > 0:
                 response['color'] = i3status_config['color_degraded']
-            response['full_text'] = "%s %d" % \
-                    (title, unread)
+            response['full_text'] = "%s %d" % (
+                title, unread)
         else:
             # Carry over index of subject list:
             if self.currentSub >= len(subjects):
                 self.currentSub = 0
-            response['full_text'] = "%s %d: %s" % \
-                    (title, self.currentSub, \
-                    subjects[self.currentSub])
+            response['full_text'] = "%s %d: %s" % (
+                title, self.currentSub, subjects[self.currentSub])
 
         response['cached_until'] = time() + interval
 
         return (order, response)
-

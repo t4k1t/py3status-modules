@@ -22,12 +22,12 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """
 
-from configparser import SafeConfigParser, NoSectionError, NoOptionError
+from configparser import SafeConfigParser, NoSectionError
 from os import path
 from shlex import split
 from subprocess import check_output, CalledProcessError, STDOUT
-from sys import stderr
 from time import time
+
 
 class Data:
     """Aquire data."""
@@ -41,13 +41,13 @@ class Data:
         tasks = int(stats[5])
 
         try:
-            overdueList = check_output(["task", "overdue"], \
-                    stderr=STDOUT).split()
+            overdueList = check_output(
+                ["task", "overdue"], stderr=STDOUT).split()
             overdue = int(overdueList[len(overdueList)-2])
         except CalledProcessError:
             overdue = -1
         except OSError:
-            stderr.write("\ntaskwarrior: failed to execute 'task overdue'\n\n")
+            raise Exception("taskwarrior: failed to execute 'task overdue'")
             exit(1)
 
         return tasks, overdue
@@ -61,7 +61,7 @@ class Py3status:
         try:
             check_output(["task", "--version"], stderr=STDOUT)
         except OSError:
-            stderr.write("\ntaskwarrior: failed to execute 'task'")
+            raise Exception("taskwarrior: failed to execute 'task'")
             exit(1)
         self.conf = self._read_config()
         self.data = Data()
@@ -69,15 +69,15 @@ class Py3status:
     def _read_config(self):
         """Read config file."""
         conf = {}
-        config = SafeConfigParser({'title':'TASK:', 'order':'0',
-            'interval':'0'})
+        config = SafeConfigParser({
+            'title': 'TASK:', 'order': '0', 'interval': '0'})
         config.read([path.expanduser('~/.i3/py3status/modules.ini')])
         try:
             conf['title'] = split(config.get('taskstatus', 'title'))[0]
             conf['order'] = config.getint('taskstatus', 'order')
             conf['interval'] = config.getint('taskstatus', 'interval')
         except NoSectionError:
-            stderr.write("\ntaskstatus: no taskstatus section in config\n\n")
+            raise Exception("taskstatus: no taskstatus section in config")
             conf['title'] = split(config.get('DEFAULT', 'title'))[0]
             conf['order'] = config.getint('DEFAULT', 'order')
             conf['interval'] = config.getint('DEFAULT', 'interval')

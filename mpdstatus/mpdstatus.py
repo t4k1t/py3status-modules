@@ -25,13 +25,13 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 # TODO: allow configuration of multiple mpd connections.
 
-from configparser import SafeConfigParser, NoSectionError, NoOptionError
+from configparser import SafeConfigParser, NoSectionError
 from os import path
 from shlex import split
-from sys import stderr
 from time import time
 
 from mpd import MPDClient
+
 
 class Data:
     """Aquire data."""
@@ -39,6 +39,7 @@ class Data:
     def __init__(self, host, port):
         self.count = 0
         self.HOST = host
+        self.HOST = "10.0.0.2"
         self.PORT = port
         self.client = MPDClient()
         self._connect()
@@ -48,8 +49,9 @@ class Data:
         try:
             self.client.connect(self.HOST, self.PORT)
         except:
-            stderr.write("\nmpdstatus: couldn't connect to %s at port %d.\n\n"
-                    % (self.HOST, self.PORT))
+            raise Exception(
+                "mpdstatus: couldn't connect to %s at port %d" %
+                (self.HOST, self.PORT))
 
     def disconnect(self):
         """Close connection to MPD cleanly."""
@@ -99,8 +101,9 @@ class Py3status:
     def _read_config(self):
         """Read config file."""
         conf = {}
-        config = SafeConfigParser({'title':'MPD:', 'order':'0',
-            'interval':'0', 'host':'localhost', 'port':'6600'})
+        config = SafeConfigParser({
+            'title': 'MPD:', 'order': '0', 'interval': '0',
+            'host': 'localhost', 'port': '6600'})
         config.read([path.expanduser('~/.i3/py3status/modules.ini')])
         try:
             conf['title'] = split(config.get('mpdstatus', 'title'))[0]
@@ -109,7 +112,7 @@ class Py3status:
             conf['host'] = split(config.get('mpdstatus', 'host'))[0]
             conf['port'] = config.getint('mpdstatus', 'port')
         except NoSectionError:
-            stderr.write("\nmpdstatus: no mpdstatus section in config.\n\n")
+            raise Exception("mpdstatus: no mpdstatus section in config")
             conf['title'] = split(config.get('DEFAULT', 'title'))[0]
             conf['order'] = config.getint('DEFAULT', 'order')
             conf['interval'] = config.getint('DEFAULT', 'interval')
@@ -148,7 +151,7 @@ class Py3status:
                 response['color'] = i3status_config['color_degraded']
 
             response['full_text'] = "%s %s - %s" % \
-                    (TITLE, artist, songtitle)
+                (TITLE, artist, songtitle)
         else:
             self.data.reconnect()
             response['color'] = i3status_config['color_bad']
@@ -157,4 +160,3 @@ class Py3status:
         response['cached_until'] = time() + INTERVAL
 
         return (ORDER, response)
-

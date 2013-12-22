@@ -4,7 +4,12 @@ py3status-modules
 
 Collection of modules for py3status_.
 
-These modules will need python3 to work.
+dependencies
+============
+
+python (>=3.2)
+py3status (>=1.1)
+python-mpd (>=0.5.1) *mpdstatus*
 
 
 modules
