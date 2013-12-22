@@ -7,9 +7,9 @@ Collection of modules for py3status_.
 dependencies
 ============
 
-python (>=3.2)
-py3status (>=1.1)
-python-mpd (>=0.5.1) *mpdstatus*
+- python (>=3.2)
+- py3status (>=1.1)
+- python-mpd (>=0.5.1) *mpdstatus*
 
 
 modules
