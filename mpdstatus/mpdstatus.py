@@ -39,7 +39,6 @@ class Data:
     def __init__(self, host, port):
         self.count = 0
         self.HOST = host
-        self.HOST = "10.0.0.2"
         self.PORT = port
         self.client = MPDClient()
         self._connect()
@@ -49,9 +48,7 @@ class Data:
         try:
             self.client.connect(self.HOST, self.PORT)
         except:
-            raise Exception(
-                "mpdstatus: couldn't connect to %s at port %d" %
-                (self.HOST, self.PORT))
+            pass
 
     def disconnect(self):
         """Close connection to MPD cleanly."""
