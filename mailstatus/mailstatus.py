@@ -3,10 +3,7 @@
 """mailstatus
 
 Mailstatus is an email module for py3status.
-It operates in two modes:
-    'unread' mode: show number of unread mails
-    'subject' mode: show subject of first unread email; on right click show
-        subject of next unread mail
+It shows the number of unread mails in your mailboxes.
 
 Copyright (C) 2013 Tablet Mode <tablet-mode AT monochromatic DOT cc>
 
@@ -25,10 +22,9 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """
 
-from configparser import SafeConfigParser, NoSectionError, NoOptionError
-from email.header import decode_header
+from configparser import SafeConfigParser, NoOptionError, NoSectionError
 from mailbox import Maildir, NoSuchMailboxError
-from os import path
+from os import listdir, path
 from shlex import split
 from time import time
 
@@ -39,59 +35,65 @@ class Data:
     def __init__(self, mailboxes):
         self.read_mailboxes(mailboxes)
 
-    def decode_subject(self, subject):
-        """Return decoded subject line."""
-        decodedSub = ''
-        for sub, enc in decode_header(subject):
-            if enc is None:
-                if isinstance(sub, str):
-                    decodedSub += sub
-                else:
-                    decodedSub += sub.decode() + " "
-            else:
-                decodedSub += sub.decode(enc) + " "
-
-        return decodedSub
-
     def read_mailboxes(self, mailboxes):
         """Return list of mailboxes.
         Exit on invalid mailbox.
 
         """
         mboxes = []
+        state = []
+        unread = []
         if mailboxes:
             for mdir in mailboxes:
                 try:
                     mboxes.append(Maildir(mdir, create=False))
+                    state.append('')
+                    unread.append(0)
                 except NoSuchMailboxError:
                     raise Exception(
                         "mailstatus: %s doesn't appear to be a mailbox" % mdir)
                     exit(1)
         self.mboxes = mboxes
+        self.mbox_state = state
+        self.unread = unread
+
+    def get_unread_maildir(self, mbox):
+        mdir = mbox._paths['new']
+        unread = len(
+            [item for item in listdir(mdir) if path.isfile(path.join(
+                mdir, item))])
+        return unread
 
     def get_unread(self):
-        """Return number of unread emails and a list containing the respective
-        subjects.
-
-        """
-        unread = 0
-        subjects = []
+        """Return number of unread emails."""
+        unread_mails = 0
         if not self.mboxes:
-            unread = 'no mailbox configured'
+            unread_mails = 'no mailbox configured'
+            return unread_mails
 
+        last_state = self.mbox_state[:]
+        unread_per_box = self.unread[:]
+        ct = 0
         for mbox in self.mboxes:
-            for message in mbox:
-                flags = message.get_flags()
-                subject = message['subject']
+            keys = sorted(mbox.keys())
+            self.mbox_state[ct] = keys
+            if self.mbox_state[ct] == last_state[ct]:
+                pass
+            else:
+                unread_per_box[ct] = 0
+                if isinstance(mbox, Maildir):
+                    unread_per_box[ct] = self.get_unread_maildir(mbox)
+                else:
+                    for message in mbox:
+                        flags = message.get_flags()
+                        if 'S' not in flags:
+                            unread_per_box[ct] += 1
+            ct += 1
+        for mail in unread_per_box:
+            unread_mails += mail
+        self.unread = unread_per_box
 
-                if not subject:
-                    subject = "no subject"
-                if 'S' not in flags:
-                    unread += 1
-                    decodedSub = self.decode_subject(subject)
-                    subjects.append(decodedSub)
-
-        return unread, subjects
+        return unread_mails
 
 
 class Py3status:
@@ -100,7 +102,6 @@ class Py3status:
         self.conf = self._read_config()
         self.data = Data(self.conf['mailboxes'])
         self.status = 'unread'
-        self.currentSub = 0
 
     def _read_config(self):
         """Read config file."""
@@ -127,17 +128,7 @@ class Py3status:
 
     def on_click(self, json, i3status_config, event):
         """Handle mouse clicks."""
-        # Switch mode on middle click:
-        if event['button'] == 2:
-            if self.status == 'unread':
-                self.status = 'subject'
-            else:
-                self.status = 'unread'
-        # On right click increase index of subject list by one. This controls
-        # which subject will be shown in 'subject' mode:
-        if event['button'] == 3:
-            if self.status == 'subject':
-                self.currentSub += 1
+        pass
 
     def mailstatus(self, json, i3status_config):
         """Return response for i3status bar."""
@@ -145,23 +136,17 @@ class Py3status:
         interval = self.conf['interval']
         order = self.conf['order']
         response = {'full_text': '', 'name': 'mailstatus'}
-        unread, subjects = self.data.get_unread()
+        unread = self.data.get_unread()
 
         if isinstance(unread, str):
             response['color'] = i3status_config['color_bad']
             response['full_text'] = "%s %s" % (
                 title, unread)
-        elif self.status == 'unread':
+        else:
             if unread > 0:
                 response['color'] = i3status_config['color_degraded']
             response['full_text'] = "%s %d" % (
                 title, unread)
-        else:
-            # Carry over index of subject list:
-            if self.currentSub >= len(subjects):
-                self.currentSub = 0
-            response['full_text'] = "%s %d: %s" % (
-                title, self.currentSub, subjects[self.currentSub])
 
         response['cached_until'] = time() + interval
 

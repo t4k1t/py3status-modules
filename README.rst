@@ -15,10 +15,7 @@ dependencies
 modules
 =======
 
-- mailstatus operates in two modes
-    - unread mode shows number of unread mails.
-    - subject mode shows subject of the unread mails. A right click will show
-      the subject of the next email.
+- mailstatus shows the number of unread mails in your mailboxes.
 
 - taskstatus shows open Taskwarrior_ tasks. If you have overdue tasks it also
   displays the number of overdue tasks and changes color.
