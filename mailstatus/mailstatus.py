@@ -75,8 +75,8 @@ class Data:
         unread_per_box = self.unread[:]
         ct = 0
         for mbox in self.mboxes:
-            keys = sorted(mbox.keys())
-            self.mbox_state[ct] = keys
+            mbox.keys()
+            self.mbox_state[ct] = mbox._toc
             if self.mbox_state[ct] == last_state[ct]:
                 pass
             else:
