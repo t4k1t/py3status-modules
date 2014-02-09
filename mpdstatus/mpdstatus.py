@@ -27,19 +27,19 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 from configparser import SafeConfigParser, NoSectionError
 from os import path
-from shlex import split
 from time import time
 
-from mpd import MPDClient
+from mpd import MPDClient, CommandError
 
 
 class Data:
     """Aquire data."""
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, password):
         self.count = 0
         self.HOST = host
         self.PORT = port
+        self.PW = password
         self.client = MPDClient()
         self._connect()
 
@@ -47,8 +47,11 @@ class Data:
         """Connect to MPD."""
         try:
             self.client.connect(self.HOST, self.PORT)
-        except:
-            pass
+            if self.PW:
+                self.client.password(self.PW)
+        except CommandError as e:
+            if "incorrect password" in str(e):
+                raise Exception("mpdstatus: Incorrect password.")
 
     def disconnect(self):
         """Close connection to MPD cleanly."""
@@ -93,28 +96,31 @@ class Py3status:
 
     def __init__(self):
         self.conf = self._read_config()
-        self.data = Data(self.conf['host'], self.conf['port'])
+        self.data = Data(
+            self.conf['host'], self.conf['port'], self.conf['password'])
 
     def _read_config(self):
         """Read config file."""
         conf = {}
         config = SafeConfigParser({
             'title': 'MPD:', 'order': '0', 'interval': '0',
-            'host': 'localhost', 'port': '6600'})
+            'host': 'localhost', 'port': '6600', 'password': None})
         config.read([path.expanduser('~/.i3/py3status/modules.ini')])
         try:
-            conf['title'] = split(config.get('mpdstatus', 'title'))[0]
+            conf['title'] = config.get('mpdstatus', 'title')
             conf['order'] = config.getint('mpdstatus', 'order')
             conf['interval'] = config.getint('mpdstatus', 'interval')
-            conf['host'] = split(config.get('mpdstatus', 'host'))[0]
+            conf['host'] = config.get('mpdstatus', 'host')
             conf['port'] = config.getint('mpdstatus', 'port')
+            conf['password'] = config.get('mpdstatus', 'password')
         except NoSectionError:
             raise Exception("mpdstatus: no mpdstatus section in config")
-            conf['title'] = split(config.get('DEFAULT', 'title'))[0]
+            conf['title'] = config.get('DEFAULT', 'title')
             conf['order'] = config.getint('DEFAULT', 'order')
             conf['interval'] = config.getint('DEFAULT', 'interval')
-            conf['host'] = split(config.get('DEFAULT', 'host'))[0]
+            conf['host'] = config.get('DEFAULT', 'host')
             conf['port'] = config.getint('DEFAULT', 'port')
+            conf['password'] = config.get('DEFAULT', 'password')
 
         return conf
 
