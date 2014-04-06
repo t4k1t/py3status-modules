@@ -19,3 +19,15 @@ interval = 0
 ;host = localhost
 ;port = 6600
 ;password =
+
+[batterystatus]
+;title = ⚡
+order = 9
+interval = 2
+threshold = 15
+; output format; possible values:
+;  {bar}          Bar representation of current charge
+;  {percentage}   Current charge in percent
+;  {time}         Remaining time (until empty/full)
+;  {state}        Battery state (charing, discharging, full)
+format = {bar} {percentage}%% {time}

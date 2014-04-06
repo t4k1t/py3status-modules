@@ -10,6 +10,8 @@ dependencies
 - python (>=3.2)
 - py3status (>=1.1)
 - python-mpd (>=0.5.1) *mpdstatus*
+- upower (>=0.9.23) *batterystatus*
+- dbus-python (>=1.2.0) *batterystatus*
 
 
 modules
@@ -23,6 +25,10 @@ modules
 - mpdstatus connects to MPD_ and shows the currently playing song. Left click
   will go to the previous song, right click will jump to the next song and
   middle click will pause playback.
+
+- batterystatus shows the status of your battery as reported by upower. For
+  upower support batterystatus uses slightly modified code of the batti_
+  project.
 
 
 configuration
@@ -51,6 +57,19 @@ You can configure each module in `~/.i3/py3status/modules.ini`::
     ;host = 'localhost'
     ;port = 6600
 
+    [batterystatus]
+    ;title = ⚡
+    order = 9
+    interval = 2
+    threshold = 15
+    ; output format; possible values:
+    ;  {bar}          Bar representation of current charge
+    ;  {percentage}   Current charge in percent
+    ;  {time}         Remaining time (until empty/full)
+    ;  {state}        Battery state (charing, discharging, full)
+    format = {bar} {percentage}%% {time}
+
 .. _MPD: http://www.musicpd.org/
 .. _py3status: https://github.com/ultrabug/py3status
 .. _Taskwarrior: http://taskwarrior.org/
+.. _batti: https://code.google.com/p/batti-gtk/
