@@ -133,7 +133,10 @@ class Py3status:
         self.conf = self._read_config()
         self.data = Data()
         batteries = self.data.update_batteries()
-        if len(batteries) > 1:
+        battery_count = len(batteries)
+        if battery_count == 0:
+            setattr(Py3status, 'no_battery', True)
+        elif battery_count > 1:
             setattr(Py3status, 'battery', self.batterystatus)
 
     def _read_config(self):
@@ -200,7 +203,11 @@ class Py3status:
         INTERVAL = self.conf['interval']
         ORDER = self.conf['order']
         THRESHOLD = self.conf['threshold']
-        response = {'full_text': '', 'name': 'batterystatus'}
+        response = {'full_text': '{title} no battery'.format(title=TITLE),
+                    'name': 'batterystatus'}
+        if self.no_battery:
+            response['color'] = i3status_config['color_degraded']
+            return (ORDER, response)
 
         pformat = self.conf['format']
 
