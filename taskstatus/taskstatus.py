@@ -24,12 +24,12 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 from configparser import SafeConfigParser, NoSectionError
 from os import path
-from shlex import split
 from subprocess import check_output, CalledProcessError, STDOUT
 from time import time
 
 
 class Data:
+
     """Aquire data."""
 
     def get_tasks(self):
@@ -48,21 +48,21 @@ class Data:
             overdue = -1
         except OSError:
             raise Exception("taskwarrior: failed to execute 'task overdue'")
-            exit(1)
 
         return tasks, overdue
 
 
 class Py3status:
+
     """Called by py3status."""
 
     def __init__(self):
-        """See if we can find taskwarrior."""
+        """Read config, initialise Data class."""
+        # See if we can find taskwarrior.
         try:
             check_output(["task", "--version"], stderr=STDOUT)
         except OSError:
             raise Exception("taskwarrior: failed to execute 'task'")
-            exit(1)
         self.conf = self._read_config()
         self.data = Data()
 
@@ -73,12 +73,12 @@ class Py3status:
             'title': 'TASK:', 'order': '0', 'interval': '0'})
         config.read([path.expanduser('~/.i3/py3status/modules.ini')])
         try:
-            conf['title'] = split(config.get('taskstatus', 'title'))[0]
+            conf['title'] = config.get('taskstatus', 'title')
             conf['order'] = config.getint('taskstatus', 'order')
             conf['interval'] = config.getint('taskstatus', 'interval')
         except NoSectionError:
             raise Exception("taskstatus: no taskstatus section in config")
-            conf['title'] = split(config.get('DEFAULT', 'title'))[0]
+            conf['title'] = config.get('DEFAULT', 'title')
             conf['order'] = config.getint('DEFAULT', 'order')
             conf['interval'] = config.getint('DEFAULT', 'interval')
 

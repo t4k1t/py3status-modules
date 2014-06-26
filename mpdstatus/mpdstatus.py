@@ -33,9 +33,11 @@ from mpd import MPDClient, CommandError
 
 
 class Data:
+
     """Aquire data."""
 
     def __init__(self, host, port, password):
+        """Initialise MPD client."""
         self.count = 0
         self.HOST = host
         self.PORT = port
@@ -62,6 +64,7 @@ class Data:
             pass
 
     def reconnect(self):
+        """Try to reaquire MPD connection."""
         self.disconnect()
         self._connect()
 
@@ -75,16 +78,19 @@ class Data:
             return True
 
     def previous(self):
+        """Jump to previous song."""
         self.client.previous()
 
     def next(self):
+        """Go to next song."""
         self.client.next()
 
     def pause(self):
+        """Pause playback."""
         self.client.pause()
 
     def get_stats(self):
-        """Return Artist, Songtitle and Playback State."""
+        """Return artist, songtitle and playback state."""
         song = self.client.currentsong()
         status = self.client.status()
         artist = song['artist']
@@ -94,7 +100,10 @@ class Data:
 
 class Py3status:
 
+    """This is where all the py3status magic happens."""
+
     def __init__(self):
+        """Read config and initialise Data class."""
         self.conf = self._read_config()
         self.data = Data(
             self.conf['host'], self.conf['port'], self.conf['password'])
@@ -130,10 +139,13 @@ class Py3status:
 
     def on_click(self, json, i3status_config, event):
         """Handle mouse clicks."""
+        # Left click: Go to previous song
         if event['button'] == 1:
             self.data.previous()
+        # Middle click: Pause playback
         elif event['button'] == 2:
             self.data.pause()
+        # Right click: Jump to next song
         elif event['button'] == 3:
             self.data.next()
 

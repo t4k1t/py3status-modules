@@ -37,7 +37,7 @@ configuration
 You can configure each module in `~/.i3/py3status/modules.ini`::
 
     [mailstatus]
-    ;title = '✉'
+    ;title = ✉
     ; where to put module output (can be between stock i3status ones)
     order = 0
     ; refresh interval in seconds
@@ -46,16 +46,17 @@ You can configure each module in `~/.i3/py3status/modules.ini`::
     ;mailboxes = '/path/to/mailbox' '/path/to/another/mailbox'
 
     [taskstatus]
-    ;title = '✓'
+    ;title = ✓
     order = 1
     interval = 120
 
     [mpdstatus]
-    ;title = '♬'
+    ;title = ♬
     order = 2
     interval = 0
     ;host = 'localhost'
     ;port = 6600
+    ;password =
 
     [batterystatus]
     ;title = ⚡

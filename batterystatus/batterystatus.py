@@ -37,7 +37,10 @@ from dbus.mainloop.glib import DBusGMainLoop
 
 class BatteryInfo(object):
 
+    """Base class containing battery info."""
+
     def __init__(self, present=True, state="unknown", percentage=0, time=0):
+        """Initialise with some default values."""
         self._present = present
         self._state = state
         self._percentage = percentage
@@ -45,6 +48,7 @@ class BatteryInfo(object):
 
 
 class Data:
+
     """Aquire data."""
 
     dbus_service = 'org.freedesktop.UPower'
@@ -55,6 +59,7 @@ class Data:
     bat_type = 2
 
     def __init__(self):
+        """Initialise dbus loop."""
         DBusGMainLoop(set_as_default=True)
         try:
             self.__bus = dbus.SystemBus()
@@ -66,16 +71,19 @@ class Data:
             raise Exception("batterystatus: {0}".format(e_upower))
 
     def _get_interface(self):
+        """Create dbus interface."""
         dkit_obj = self.__bus.get_object(self.dbus_service, self.dbus_object)
         return dbus.Interface(dkit_obj, self.dbus_service)
 
     def _get_battery(self, udi):
+        """Get dbus interface for specific device."""
         battery_obj = self.__bus.get_object(self.dbus_service, udi)
         prop_iface = dbus.Interface(battery_obj, self.property_iface)
         dev_iface = dbus.Interface(battery_obj, self.device_iface)
         return (prop_iface, dev_iface)
 
     def update_batteries(self):
+        """Load available batteries."""
         batteries = []
         for dev in self.devices:
             (prop_iface, dev_iface) = self._get_battery(dev)
@@ -87,6 +95,7 @@ class Data:
         return batteries
 
     def get_state(self):
+        """Get battery info."""
         battery = BatteryInfo()
         on_bat = self._on_battery()
         for dev in self.devices:
@@ -124,12 +133,16 @@ class Data:
         return battery, on_bat
 
     def _on_battery(self):
+        """Check if connected to power line."""
         return self.properties.Get(self.device_iface, 'OnBattery')
 
 
 class Py3status:
 
+    """This is where all the py3status magic happens."""
+
     def __init__(self):
+        """Read config, add additional batteries."""
         self.conf = self._read_config()
         self.data = Data()
         batteries = self.data.update_batteries()
@@ -141,7 +154,6 @@ class Py3status:
 
     def _read_config(self):
         """Read config file."""
-
         conf = {}
         config = SafeConfigParser({
             'title': 'BAT:', 'order': '0', 'interval': '0', 'threshold': '15',
@@ -164,27 +176,8 @@ class Py3status:
 
         return conf
 
-    def kill(self, json, i3status_config, event):
-        """Handle termination."""
-
-        pass
-
-    def on_click(self, json, i3status_config, event):
-        """Handle mouse clicks."""
-
-        # Left mouse button
-        if event['button'] == 1:
-            pass
-        # Middle mouse button
-        # The default action for the middle button is refresh which actually
-        # makes sense, so no need to override it.
-        #elif event['button'] == 2:
-        #    pass
-        # Right mouse button
-        elif event['button'] == 3:
-            pass
-
     def _get_bar(self, percent, steps):
+        """Get power level representation in bar form."""
         bar = "["
         part = int(100 / steps)
         j = 0
@@ -198,16 +191,18 @@ class Py3status:
 
     def batterystatus(self, json, i3status_config):
         """Return response for i3status bar."""
-
         TITLE = self.conf['title']
         INTERVAL = self.conf['interval']
         ORDER = self.conf['order']
         THRESHOLD = self.conf['threshold']
         response = {'full_text': '{title} no battery'.format(title=TITLE),
                     'name': 'batterystatus'}
-        if self.no_battery:
+        try:
+            self.no_battery
             response['color'] = i3status_config['color_degraded']
             return (ORDER, response)
+        except AttributeError:
+            pass
 
         pformat = self.conf['format']
 

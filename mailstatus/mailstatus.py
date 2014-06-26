@@ -30,6 +30,7 @@ from time import time
 
 
 class Data:
+
     """Aquire data."""
 
     def __init__(self, mailboxes):
@@ -58,6 +59,12 @@ class Data:
         self.unread = unread
 
     def get_unread_maildir(self, mbox):
+        """Shortcut for maildir format.
+
+        Get number of unread mails by simply counting the number of files in
+        the 'new' folder.
+
+        """
         mdir = mbox._paths['new']
         unread = len(
             [item for item in listdir(mdir) if path.isfile(path.join(
@@ -98,7 +105,10 @@ class Data:
 
 class Py3status:
 
+    """This is where all the py3status magic happens."""
+
     def __init__(self):
+        """Read config and initialise Data class."""
         self.conf = self._read_config()
         self.data = Data(self.conf['mailboxes'])
         self.status = 'unread'
@@ -112,23 +122,19 @@ class Py3status:
 
         try:
             conf['mailboxes'] = split(config.get('mailstatus', 'mailboxes'))
-            conf['title'] = split(config.get('mailstatus', 'title'))[0]
+            conf['title'] = config.get('mailstatus', 'title')
             conf['order'] = config.getint('mailstatus', 'order')
             conf['interval'] = config.getint('mailstatus', 'interval')
         except NoSectionError:
             raise Exception("mailstatus: no mailstatus section in config")
             conf['mailboxes'] = False
-            conf['title'] = split(config.get('DEFAULT', 'title'))[0]
+            conf['title'] = config.get('DEFAULT', 'title')
             conf['order'] = config.getint('DEFAULT', 'order')
             conf['interval'] = config.getint('DEFAULT', 'interval')
         except NoOptionError:
             raise Exception("mailstatus: no mailboxes configured")
 
         return conf
-
-    def on_click(self, json, i3status_config, event):
-        """Handle mouse clicks."""
-        pass
 
     def mailstatus(self, json, i3status_config):
         """Return response for i3status bar."""
