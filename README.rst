@@ -17,16 +17,17 @@ dependencies
 modules
 =======
 
-- mailstatus shows the number of unread mails in your mailboxes.
+- ``mailstatus`` shows the number of unread mails in your mailboxes. Currently
+  only suports `Maildir` format.
 
-- taskstatus shows open Taskwarrior_ tasks. If you have overdue tasks it also
+- ``taskstatus`` shows open Taskwarrior_ tasks. If you have overdue tasks it also
   displays the number of overdue tasks and changes color.
 
-- mpdstatus connects to MPD_ and shows the currently playing song. Left click
+- ``mpdstatus`` connects to MPD_ and shows the currently playing song. Left click
   will go to the previous song, right click will jump to the next song and
   middle click will pause playback.
 
-- batterystatus shows the status of your battery as reported by upower. For
+- ``batterystatus`` shows the status of your battery as reported by upower. For
   upower support batterystatus uses slightly modified code of the batti_
   project.
 
