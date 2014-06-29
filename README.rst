@@ -9,9 +9,9 @@ dependencies
 
 - python (>=3.2)
 - py3status (>=1.1)
-- python-mpd (>=0.5.1) *mpdstatus*
-- upower (>=0.9.23) *batterystatus*
-- dbus-python (>=1.2.0) *batterystatus*
+- python-mpd (>=0.5.1) ``mpdstatus``
+- upower (>=0.9.23) ``batterystatus``
+- dbus-python (>=1.2.0) ``batterystatus``
 
 
 modules
