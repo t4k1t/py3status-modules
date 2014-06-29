@@ -28,12 +28,25 @@ from subprocess import check_output, CalledProcessError, STDOUT
 from time import time
 
 
+class TaskstatusException(Exception):
+
+    """Custom taskstatus exception."""
+
+    def __init__(self, exception):
+        """Initialisation."""
+        self.exception = exception
+
+    def __str__(self):
+        """Prepend message with 'taskstatus: '."""
+        return "taskstatus: {exception}".format(exception=self.exception)
+
+
 class Data:
 
     """Aquire data."""
 
     def get_tasks(self):
-        """Return number of overdue tasks and number of open tasks."""
+        """Return number of open and overdue tasks as tuple."""
         tasks = 0
         overdue = 0
 
@@ -44,10 +57,11 @@ class Data:
             overdueList = check_output(
                 ["task", "overdue"], stderr=STDOUT).split()
             overdue = int(overdueList[len(overdueList)-2])
-        except CalledProcessError:
-            overdue = -1
+        except CalledProcessError as e:
+            if not "No matches" in e.output:
+                raise TaskstatusException("failed to execute 'task overdue'")
         except OSError:
-            raise Exception("taskwarrior: failed to execute 'task overdue'")
+            raise TaskstatusException("failed to execute 'task overdue'")
 
         return tasks, overdue
 
@@ -62,7 +76,7 @@ class Py3status:
         try:
             check_output(["task", "--version"], stderr=STDOUT)
         except OSError:
-            raise Exception("taskwarrior: failed to execute 'task'")
+            raise TaskstatusException("failed to execute 'task'")
         self.conf = self._read_config()
         self.data = Data()
 
@@ -77,10 +91,7 @@ class Py3status:
             conf['order'] = config.getint('taskstatus', 'order')
             conf['interval'] = config.getint('taskstatus', 'interval')
         except NoSectionError:
-            raise Exception("taskstatus: no taskstatus section in config")
-            conf['title'] = config.get('DEFAULT', 'title')
-            conf['order'] = config.getint('DEFAULT', 'order')
-            conf['interval'] = config.getint('DEFAULT', 'interval')
+            raise TaskstatusException("no taskstatus section in config")
 
         return conf
 

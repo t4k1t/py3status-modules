@@ -29,16 +29,31 @@ from shlex import split
 from time import time
 
 
+class MailstatusException(Exception):
+
+    """Custom mailstatus exception."""
+
+    def __init__(self, exception):
+        """Initialisation."""
+        self.exception = exception
+
+    def __str__(self):
+        """Prepend message with 'mailstatus: '."""
+        return "mailstatus: {exception}".format(exception=self.exception)
+
+
 class Data:
 
     """Aquire data."""
 
     def __init__(self, mailboxes):
+        """Initialise data."""
         self.read_mailboxes(mailboxes)
 
     def read_mailboxes(self, mailboxes):
         """Return list of mailboxes.
-        Exit on invalid mailbox.
+
+        Raise exception on invalid mailbox.
 
         """
         mboxes = []
@@ -47,13 +62,17 @@ class Data:
         if mailboxes:
             for mdir in mailboxes:
                 try:
-                    mboxes.append(Maildir(mdir, create=False))
+                    mbox = Maildir(mdir, create=False)
+                    mbox.keys()
+                    mboxes.append(mbox)
                     state.append('')
                     unread.append(0)
                 except NoSuchMailboxError:
-                    raise Exception(
-                        "mailstatus: %s doesn't appear to be a mailbox" % mdir)
-                    exit(1)
+                    raise MailstatusException(
+                        "invalid path: {path}".format(path=mdir))
+                except FileNotFoundError:
+                    raise MailstatusException(
+                        "invalid maildir: {path}".format(path=mdir))
         self.mboxes = mboxes
         self.mbox_state = state
         self.unread = unread
@@ -126,13 +145,9 @@ class Py3status:
             conf['order'] = config.getint('mailstatus', 'order')
             conf['interval'] = config.getint('mailstatus', 'interval')
         except NoSectionError:
-            raise Exception("mailstatus: no mailstatus section in config")
-            conf['mailboxes'] = False
-            conf['title'] = config.get('DEFAULT', 'title')
-            conf['order'] = config.getint('DEFAULT', 'order')
-            conf['interval'] = config.getint('DEFAULT', 'interval')
+            raise MailstatusException("no mailstatus section in config")
         except NoOptionError:
-            raise Exception("mailstatus: no mailboxes configured")
+            raise MailstatusException("no mailboxes configured")
 
         return conf
 
