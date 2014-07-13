@@ -23,13 +23,24 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """
 
-# TODO: allow configuration of multiple mpd connections.
-
 from configparser import SafeConfigParser, NoSectionError
 from os import path
 from time import time
 
 from mpd import MPDClient, CommandError
+
+
+class MPDstatusException(Exception):
+
+    """Custom mpdstatus exception."""
+
+    def __init__(self, exception):
+        """Initialisation."""
+        self.exception = exception
+
+    def __str__(self):
+        """Prepend message with 'mpdstatus: '."""
+        return "mpdstatus: {exception}".format(exception=self.exception)
 
 
 class Data:
@@ -52,8 +63,8 @@ class Data:
             if self.PW:
                 self.client.password(self.PW)
         except CommandError as e:
-            if "incorrect password" in str(e):
-                raise Exception("mpdstatus: Incorrect password.")
+            if "incorrect password" in str(e).lower():
+                raise MPDstatusException("Incorrect password")
 
     def disconnect(self):
         """Close connection to MPD cleanly."""
@@ -61,6 +72,8 @@ class Data:
             self.client.close()
             self.client.disconnect()
         except:
+            # If this happens,  the client is most likely already disconnected
+            # anyway.
             pass
 
     def reconnect(self):
@@ -123,7 +136,7 @@ class Py3status:
             conf['port'] = config.getint('mpdstatus', 'port')
             conf['password'] = config.get('mpdstatus', 'password')
         except NoSectionError:
-            raise Exception("mpdstatus: no mpdstatus section in config")
+            raise MPDstatusException("No mpdstatus section in config")
             conf['title'] = config.get('DEFAULT', 'title')
             conf['order'] = config.getint('DEFAULT', 'order')
             conf['interval'] = config.getint('DEFAULT', 'interval')
