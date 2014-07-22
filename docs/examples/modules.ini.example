@@ -1,0 +1,24 @@
+[mailstatus]
+title = ✉
+order = 0
+interval = 0
+mailboxes = '/path/to/mailbox' '/path/to/another/mailbox'
+
+[taskstatus]
+title = ✓
+order = 1
+interval = 120
+
+[mpdstatus]
+title = ♬
+order = 2
+interval = 0
+host = localhost
+port = 6600
+
+[batterystatus]
+title = ⚡
+order = 9
+interval = 2
+threshold = 15
+format = {bar} {percentage}%% {time}
