@@ -13,7 +13,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   getting_started
+   installation
+   configuration
 
 
 Indices and tables
