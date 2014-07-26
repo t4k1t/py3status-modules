@@ -64,7 +64,7 @@ class Data:
                 self.client.password(self.PW)
         except CommandError as e:
             if "incorrect password" in str(e).lower():
-                raise MPDstatusException("Incorrect password")
+                raise MPDstatusException("incorrect password")
 
     def disconnect(self):
         """Close connection to MPD cleanly."""
@@ -136,7 +136,7 @@ class Py3status:
             conf['port'] = config.getint('mpdstatus', 'port')
             conf['password'] = config.get('mpdstatus', 'password')
         except NoSectionError:
-            raise MPDstatusException("No mpdstatus section in config")
+            # Fallback settings in case there is no mpdstatus configuration.
             conf['title'] = config.get('DEFAULT', 'title')
             conf['order'] = config.getint('DEFAULT', 'order')
             conf['interval'] = config.getint('DEFAULT', 'interval')
