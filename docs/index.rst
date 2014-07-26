@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to py3status-modules's documentation!
-=============================================
+Documentation of py3status-modules
+==================================
 
 ``py3stats-modules`` is a collection of modules for py3status_.
 
@@ -13,6 +13,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   modules
    installation
    configuration
 
