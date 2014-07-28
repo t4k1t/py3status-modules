@@ -87,7 +87,7 @@ class TestData:
     @mock.patch('mpd.MPDClient')
     @mock.patch('mpd.MPDClient.connect')
     def test_get_state(self, mock_connect, mock_client, current_song,
-                 mpd_state_play):
+                       mpd_state_play):
         """Test playback information retrieval."""
         data = None
         data = Data('', 6600, "")
@@ -121,8 +121,8 @@ class TestResponse:
     @mock.patch('mpd.MPDClient')
     @mock.patch('mpd.MPDClient.connect')
     def test_valid_config(self, mock_connect, mock_client, monkeypatch,
-                        valid_config_path, i3config,
-                        mpdstatus_response_disconnected):
+                          valid_config_path, i3config,
+                          mpdstatus_response_disconnected):
         """Test valid config."""
         monkeypatch.setattr(os.path, 'expanduser', lambda x:
                             valid_config_path)

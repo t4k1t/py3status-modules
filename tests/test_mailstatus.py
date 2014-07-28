@@ -81,19 +81,16 @@ class TestResponse:
 
     @mock.patch('mailstatus.mailstatus.Data.read_mailboxes')
     def test_no_mails(self, mock_mailboxes, monkeypatch, valid_config_path,
-                      i3config, mailstatus_response_none):
+                      i3config, mailstatus_response_none,
+                      read_mailboxes_fixture):
         """Test response without any unread mails."""
         monkeypatch.setattr(os.path, 'expanduser', lambda x:
                             valid_config_path)
         reference = mailstatus_response_none
-        def fun(*args, **kwargs):
-            self.mboxes = 0
-            self.mbox_state = 0
-            self.unread = 0
-            return
 
         py3status = Py3status()
-        py3status.data = mock.Mock(read_mailboxes=fun, get_unread=lambda: 0)
+        py3status.data = mock.Mock(read_mailboxes=read_mailboxes_fixture,
+                                   get_unread=lambda: 0)
         module = py3status.mailstatus(mock.Mock(), i3config)
         assert 'color' not in module[1]
         assert module[1]['full_text'] == reference['full_text']
@@ -101,19 +98,16 @@ class TestResponse:
 
     @mock.patch('mailstatus.mailstatus.Data.read_mailboxes')
     def test_some_mails(self, mock_mailboxes, monkeypatch, valid_config_path,
-                        i3config, mailstatus_response_some):
+                        i3config, mailstatus_response_some,
+                        read_mailboxes_fixture):
         """Test response with some unread mails."""
         monkeypatch.setattr(os.path, 'expanduser', lambda x:
                             valid_config_path)
         reference = mailstatus_response_some
-        def fun(*args, **kwargs):
-            self.mboxes = mock.Mock()
-            self.mbox_state = 0
-            self.unread = 3
-            return
 
         py3status = Py3status()
-        py3status.data = mock.Mock(read_mailboxes=fun, get_unread=lambda: 3)
+        py3status.data = mock.Mock(read_mailboxes=read_mailboxes_fixture,
+                                   get_unread=lambda: 3)
         module = py3status.mailstatus(mock.Mock(), i3config)
         assert module[1]['color'] == reference['color']
         assert module[1]['full_text'] == reference['full_text']
@@ -126,13 +120,7 @@ class TestResponse:
         """Test response with no mailboxes configured."""
         monkeypatch.setattr(os.path, 'expanduser', lambda x:
                             config_no_mailboxes_path)
-        reference = mailstatus_response_no_mailboxes
-        def fun(*args, **kwargs):
-            self.mboxes = mock.Mock()
-            self.mbox_state = 0
-            self.unread = 3
-            return
 
         with pytest.raises(MailstatusException) as e:
-            py3status = Py3status()
+            Py3status()
         assert "no mailboxes configured" in str(e)
