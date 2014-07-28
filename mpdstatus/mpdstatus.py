@@ -65,6 +65,10 @@ class Data:
         except CommandError as e:
             if "incorrect password" in str(e).lower():
                 raise MPDstatusException("incorrect password")
+        except ConnectionRefusedError:
+            # This is handled elsewhere by displaying the text `not connected`
+            # in the status bar.
+            pass
 
     def disconnect(self):
         """Close connection to MPD cleanly."""
