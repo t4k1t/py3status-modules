@@ -9,7 +9,7 @@ have to be configured before they work properly - see :ref:`configuration` for
 an explanation of the configuration format and an example.
 
 
-Mailstatus
+mailstatus
 ----------
 
 Shows the number of unread mails in all configured mailboxes.
@@ -20,7 +20,7 @@ Actions
 ``mailstatus`` does not support any actions at this point.
 
 
-MPDstatus
+mpdstatus
 ---------
 
 Displays the current song and playback status. Also it enables the user to
@@ -34,7 +34,7 @@ Actions
 * `Right Click`: Go to next song.
 
 
-Taskstatus
+taskstatus
 ----------
 
 Shows the number of open tasks. If there are any overdue tasks, the number of
@@ -46,7 +46,7 @@ Actions
 ``taskstatus`` does not support any actions at this point.
 
 
-Batterystatus
+batterystatus
 -------------
 
 Indicates the current battery status in a configurable format.

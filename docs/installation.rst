@@ -77,4 +77,4 @@ example.
 
 .. _github: https://github.com
 .. _my-little-overlay: https://github.com/twisted-pear/my-little-overlay
-.. _aur: https://aur.archlinux.org/packages/py3status-modules-tm
+.. _aur: https://aur.archlinux.org/packages/py3status-modules
