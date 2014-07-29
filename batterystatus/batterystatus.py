@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""batterystatus
+"""batterystatus py3status module.
 
 batterystatus is a battery monitoring module for py3status.
 For upower support, batterystatus relies on slightly modified code from the

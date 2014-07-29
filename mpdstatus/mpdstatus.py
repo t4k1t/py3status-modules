@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-"""mpdstatus
+"""mpdstatus py3status module.
 
-Mpdstatus is a MPD module for py3status.
+mpdstatus is a MPD module for py3status.
 It shows the currently playing song and can be used to pause, resume or stop
 playpack.
 

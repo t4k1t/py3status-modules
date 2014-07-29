@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-"""taskstatus
+"""taskstatus py3status module.
 
-Taskstatus is a taskwarrior module for py3status.
+taskstatus is a taskwarrior module for py3status.
 It shows the number of open tasks in your py3status bar.
 
 Copyright (C) 2013 Tablet Mode <tablet-mode AT monochromatic DOT cc>

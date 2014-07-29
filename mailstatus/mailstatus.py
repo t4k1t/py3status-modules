@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-"""mailstatus
+"""mailstatus py3status module.
 
-Mailstatus is an email module for py3status.
+mailstatus is an email module for py3status.
 It shows the number of unread mails in your mailboxes.
 
 Copyright (C) 2013 Tablet Mode <tablet-mode AT monochromatic DOT cc>
