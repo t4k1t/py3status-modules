@@ -71,7 +71,17 @@ You can configure each module in `~/.i3/py3status/modules.ini`::
     ;  {state}        Battery state (charing, discharging, full)
     format = {bar} {percentage}%% {time}
 
+
+documentation
+=============
+
+You can find detailed documentation at
+`py3status-modules' Read the Docs page
+<https://py3status-modules.readthedocs.org/en/latest/>`_, powered by Sphinx_.
+
+
 .. _MPD: http://www.musicpd.org/
 .. _py3status: https://github.com/ultrabug/py3status
 .. _Taskwarrior: http://taskwarrior.org/
 .. _batti: https://code.google.com/p/batti-gtk/
+.. _Sphinx: http://sphinx-doc.org
