@@ -21,8 +21,6 @@ Contents:
 Indices and tables
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
 
 .. _py3status: https://github.com/ultrabug/py3status
