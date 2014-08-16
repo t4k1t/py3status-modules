@@ -65,7 +65,7 @@ mailstatus section
 
 ``mailboxes``
    Space-separated list of paths to the mailboxes that should be monitored by
-   ``mailstatus``.
+   ``mailstatus``. At this time only the ``Maildir`` format is supported.
 
 
 taskstatus section
