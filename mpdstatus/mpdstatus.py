@@ -110,7 +110,7 @@ class Data:
         """Return artist, songtitle and playback state."""
         song = self.client.currentsong()
         status = self.client.status()
-        artist = song['artist']
+        artist = song['artist'] if 'artist' in song else "Unknown Artist"
 
         return artist, song['title'], status['state']
 
