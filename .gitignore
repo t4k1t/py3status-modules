@@ -6,6 +6,7 @@ dist
 *.egg-info
 
 # testing
+htmlcov
 _coverage
 .coverage
 .tox/*
