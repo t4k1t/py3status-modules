@@ -56,6 +56,13 @@ class Data:
         self.client = MPDClient()
         self._connect()
 
+    def _crop_text(self, text, length=32):
+        """Crop string to specified length."""
+        if len(text) > length:
+            text = "{}...".format(text[:length])
+
+        return text
+
     def _connect(self):
         """Connect to MPD."""
         try:
@@ -108,9 +115,10 @@ class Data:
 
     def get_stats(self):
         """Return artist, songtitle and playback state."""
-        song = self.client.currentsong()
+        song = self._crop_text(self.client.currentsong())
         status = self.client.status()
-        artist = song['artist'] if 'artist' in song else "Unknown Artist"
+        artist = self._crop_text(
+            song['artist']) if 'artist' in song else "Unknown Artist"
 
         return artist, song['title'], status['state']
 
