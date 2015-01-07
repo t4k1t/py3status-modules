@@ -56,3 +56,12 @@ Actions
 
 ``batterystatus`` does not support any actions at this point.
 
+alsastatus
+----------
+
+Prints the current ALSA volume for a configurable mixer.
+
+Actions
+^^^^^^^
+
+* `Middle Click`: Mute/Unmute mixer.
