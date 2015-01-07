@@ -36,38 +36,6 @@ def invalid_maildir(tmpdir):
 
 
 @pytest.fixture
-def config_no_mailboxes(tmpdir):
-    """Configuration without mailboxes key."""
-    f = tmpdir.join("modules.ini")
-    f.write("""
-[mailstatus]
-title = ✉
-""")
-    return tmpdir
-
-
-@pytest.fixture
-def config_no_mailboxes_path(config_no_mailboxes):
-    """Path to configuration without mailboxes key ."""
-    pathstring = ('{dir}/{base}/modules.ini'.format(
-        dir=config_no_mailboxes.dirname,
-        base=config_no_mailboxes.basename))
-    return pathstring
-
-
-@pytest.fixture
-def config_empty_mailboxes(tmpdir):
-    """Configuration without any mailboxes."""
-    f = tmpdir.join("modules.ini")
-    f.write("""
-[mailstatus]
-title = ✉
-mailboxes =
-""")
-    return tmpdir
-
-
-@pytest.fixture
 def read_mailboxes_fixture():
     def read_mailboxes(self, *args, **kwargs):
         self.mboxes = mock.Mock()
@@ -115,9 +83,6 @@ __all__ = (
     'maildir',
     'maildir_new_mail',
     'invalid_maildir',
-    'config_no_mailboxes',
-    'config_no_mailboxes_path',
-    'config_empty_mailboxes',
     'read_mailboxes_fixture',
     'mailstatus_response_none',
     'mailstatus_response_some',
