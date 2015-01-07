@@ -23,8 +23,6 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """
 
-from configparser import SafeConfigParser, NoSectionError
-from os import path
 from time import time
 
 from mpd import MPDClient, CommandError
@@ -83,7 +81,7 @@ class Data:
             self.client.close()
             self.client.disconnect()
         except:
-            # If this happens,  the client is most likely already disconnected
+            # If this happens, the client is most likely already disconnected
             # anyway.
             pass
 
@@ -127,36 +125,15 @@ class Py3status:
 
     """This is where all the py3status magic happens."""
 
+    cache_timeout = 0
+    name = 'MPD:'
+    host = 'localhost'
+    port = 6600
+    password = ''
+
     def __init__(self):
-        """Read config and initialise Data class."""
-        self.conf = self._read_config()
-        self.data = Data(
-            self.conf['host'], self.conf['port'], self.conf['password'])
-
-    def _read_config(self):
-        """Read config file."""
-        conf = {}
-        config = SafeConfigParser({
-            'title': 'MPD:', 'order': '0', 'interval': '0',
-            'host': 'localhost', 'port': '6600', 'password': None})
-        config.read([path.expanduser('~/.i3/py3status/modules.ini')])
-        try:
-            conf['title'] = config.get('mpdstatus', 'title')
-            conf['order'] = config.getint('mpdstatus', 'order')
-            conf['interval'] = config.getint('mpdstatus', 'interval')
-            conf['host'] = config.get('mpdstatus', 'host')
-            conf['port'] = config.getint('mpdstatus', 'port')
-            conf['password'] = config.get('mpdstatus', 'password')
-        except NoSectionError:
-            # Fallback settings in case there is no mpdstatus configuration.
-            conf['title'] = config.get('DEFAULT', 'title')
-            conf['order'] = config.getint('DEFAULT', 'order')
-            conf['interval'] = config.getint('DEFAULT', 'interval')
-            conf['host'] = config.get('DEFAULT', 'host')
-            conf['port'] = config.getint('DEFAULT', 'port')
-            conf['password'] = config.get('DEFAULT', 'password')
-
-        return conf
+        """Initialisation."""
+        self.data = None
 
     def kill(self, json, i3status_config, event):
         """Handle termination."""
@@ -176,10 +153,13 @@ class Py3status:
 
     def mpdstatus(self, json, i3status_config):
         """Return response for i3status bar."""
-        TITLE = self.conf['title']
-        INTERVAL = self.conf['interval']
-        ORDER = self.conf['order']
         response = {'full_text': '', 'name': 'mpdstatus'}
+
+        # Initialise Data class only once
+        # TODO: parse settings in separate function for better error handling
+        if not self.data:
+            self.data = Data(self.host, self.port, self.password)
+
         connection = self.data.has_connection()
 
         if connection:
@@ -191,12 +171,12 @@ class Py3status:
                 response['color'] = i3status_config['color_degraded']
 
             response['full_text'] = "%s %s - %s" % \
-                (TITLE, artist, songtitle)
+                (self.name, artist, songtitle)
         else:
             self.data.reconnect()
             response['color'] = i3status_config['color_bad']
-            response['full_text'] = "%s not connected" % (TITLE)
+            response['full_text'] = "%s not connected" % (self.name)
 
-        response['cached_until'] = time() + INTERVAL
+        response['cached_until'] = time() + self.cache_timeout
 
-        return (ORDER, response)
+        return response

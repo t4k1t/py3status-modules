@@ -22,7 +22,6 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """
 
-from configparser import SafeConfigParser, NoOptionError, NoSectionError
 from mailbox import Maildir, NoSuchMailboxError
 from os import listdir, path
 from shlex import split
@@ -47,7 +46,7 @@ class Data:
     """Aquire data."""
 
     def __init__(self, mailboxes):
-        """Initialise data."""
+        """Initialisation."""
         self.read_mailboxes(mailboxes)
 
     def read_mailboxes(self, mailboxes):
@@ -77,7 +76,7 @@ class Data:
         self.mbox_state = state
         self.unread = unread
 
-    def get_unread_maildir(self, mbox):
+    def _get_unread_maildir(self, mbox):
         """Shortcut for maildir format.
 
         Get number of unread mails by simply counting the number of files in
@@ -108,7 +107,7 @@ class Data:
             else:
                 unread_per_box[ct] = 0
                 if isinstance(mbox, Maildir):
-                    unread_per_box[ct] = self.get_unread_maildir(mbox)
+                    unread_per_box[ct] = self._get_unread_maildir(mbox)
                 else:
                     for message in mbox:
                         flags = message.get_flags()
@@ -126,49 +125,36 @@ class Py3status:
 
     """This is where all the py3status magic happens."""
 
+    cache_timeout = 10
+    name = 'MAIL:'
+    mailboxes = ''
+
     def __init__(self):
-        """Read config and initialise Data class."""
-        self.conf = self._read_config()
-        self.data = Data(self.conf['mailboxes'])
-        self.status = 'unread'
-
-    def _read_config(self):
-        """Read config file."""
-        conf = {}
-        config = SafeConfigParser({
-            'title': 'MAIL:', 'order': '0', 'interval': '0'})
-        config.read([path.expanduser('~/.i3/py3status/modules.ini')])
-
-        try:
-            conf['mailboxes'] = split(config.get('mailstatus', 'mailboxes'))
-            conf['title'] = config.get('mailstatus', 'title')
-            conf['order'] = config.getint('mailstatus', 'order')
-            conf['interval'] = config.getint('mailstatus', 'interval')
-        except NoSectionError:
-            raise MailstatusException("no mailstatus section in config")
-        except NoOptionError:
-            raise MailstatusException("no mailboxes configured")
-
-        return conf
+        """Initialisation."""
+        self.data = None
 
     def mailstatus(self, json, i3status_config):
         """Return response for i3status bar."""
-        title = self.conf['title']
-        interval = self.conf['interval']
-        order = self.conf['order']
-        response = {'full_text': '', 'name': 'mailstatus'}
+        response = {'full_text': ''}
+
+        # use split from the shlex lib here because it allows you to escape
+        # whitespaces
+        # TODO: parse mailboxes in separate function for better error handling
+        if not self.data:
+            self.data = Data(split(self.mailboxes))
+
         unread = self.data.get_unread()
 
         if isinstance(unread, str):
             response['color'] = i3status_config['color_bad']
             response['full_text'] = "%s %s" % (
-                title, unread)
+                self.name, unread)
         else:
             if unread > 0:
                 response['color'] = i3status_config['color_degraded']
             response['full_text'] = "%s %d" % (
-                title, unread)
+                self.name, unread)
 
-        response['cached_until'] = time() + interval
+        response['cached_until'] = time() + self.cache_timeout
 
-        return (order, response)
+        return response

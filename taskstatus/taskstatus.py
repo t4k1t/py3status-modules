@@ -22,8 +22,6 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """
 
-from configparser import SafeConfigParser, NoSectionError
-from os import path
 from subprocess import check_output, CalledProcessError, STDOUT
 from time import time
 
@@ -58,7 +56,7 @@ class Data:
                 ["task", "overdue"], stderr=STDOUT).split()
             overdue = int(overdueList[len(overdueList)-2])
         except CalledProcessError as e:
-            if not "No matches" in e.output:
+            if b"No matches" not in e.output:
                 raise TaskstatusException("failed to execute 'task overdue'")
         except OSError:
             raise TaskstatusException("failed to execute 'task overdue'")
@@ -70,6 +68,10 @@ class Py3status:
 
     """Called by py3status."""
 
+    cache_timeout = 0
+    name = 'TASK:'
+    data = None
+
     def __init__(self):
         """Read config, initialise Data class."""
         # See if we can find taskwarrior.
@@ -77,29 +79,10 @@ class Py3status:
             check_output(["task", "--version"], stderr=STDOUT)
         except OSError:
             raise TaskstatusException("failed to execute 'task'")
-        self.conf = self._read_config()
         self.data = Data()
-
-    def _read_config(self):
-        """Read config file."""
-        conf = {}
-        config = SafeConfigParser({
-            'title': 'TASK:', 'order': '0', 'interval': '0'})
-        config.read([path.expanduser('~/.i3/py3status/modules.ini')])
-        try:
-            conf['title'] = config.get('taskstatus', 'title')
-            conf['order'] = config.getint('taskstatus', 'order')
-            conf['interval'] = config.getint('taskstatus', 'interval')
-        except NoSectionError:
-            raise TaskstatusException("no taskstatus section in config")
-
-        return conf
 
     def taskstatus(self, json, i3status_config):
         """Return response for py3status."""
-        TITLE = self.conf['title']
-        INTERVAL = self.conf['interval']
-        ORDER = self.conf['order']
         response = {'full_text': '', 'name': 'taskstatus'}
 
         tasks, overdue = self.data.get_tasks()
@@ -107,11 +90,11 @@ class Py3status:
         if overdue > 0:
             response['color'] = i3status_config['color_bad']
             response['full_text'] = "%s %d/%d" % \
-                (TITLE, overdue, tasks)
+                (self.name, overdue, tasks)
         else:
             response['full_text'] = "%s %d" % \
-                (TITLE, tasks)
+                (self.name, tasks)
 
-        response['cached_until'] = time() + INTERVAL
+        response['cached_until'] = time() + self.cache_timeout
 
-        return (ORDER, response)
+        return response
