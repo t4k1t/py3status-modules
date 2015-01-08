@@ -9,6 +9,8 @@ have to be configured before they work properly - see :ref:`configuration` for
 an explanation of the configuration format and an example.
 
 
+.. _mailstatus_module:
+
 mailstatus
 ----------
 
@@ -19,6 +21,8 @@ Actions
 
 ``mailstatus`` does not support any actions at this point.
 
+
+.. _mpdstatus_module:
 
 mpdstatus
 ---------
@@ -34,6 +38,8 @@ Actions
 * `Right Click`: Go to next song.
 
 
+.. _taskstatus_module:
+
 taskstatus
 ----------
 
@@ -46,6 +52,8 @@ Actions
 ``taskstatus`` does not support any actions at this point.
 
 
+.. _batterystatus_module:
+
 batterystatus
 -------------
 
@@ -55,6 +63,9 @@ Actions
 ^^^^^^^
 
 ``batterystatus`` does not support any actions at this point.
+
+
+.. _alsastatus_module:
 
 alsastatus
 ----------
