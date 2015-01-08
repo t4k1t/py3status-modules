@@ -68,4 +68,4 @@ You can find detailed documentation at
 .. |docs| image:: https://readthedocs.org/projects/py3status-modules/badge/?version=latest
    :alt: Documentation status
    :scale: 100%
-   :target: https://readthedocs.org/projects/py3status-modules/
+   :target: https://py3status-modules.readthedocs.org/en/latest/
