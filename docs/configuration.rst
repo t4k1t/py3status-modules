@@ -19,6 +19,7 @@ Some basic settings can be configured for any module:
 ``cache_timeout``
    Refresh interval in seconds.
 
+.. _mailstatus_settings:
 
 mailstatus settings
 """""""""""""""""""

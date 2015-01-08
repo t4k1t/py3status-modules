@@ -19,7 +19,19 @@ Changelog
 * `batterystatus`: Make format strings conform to ``i3status.conf``. See
   :ref:`batterystatus_settings`.
 
-* Add `alsastatus` module.
+   .. warning::
+
+      Be sure to update your ``format`` setting accordingly if you used it
+      previously.
+
+* `mailstatus`: Make ``mailboxes`` setting conform to ``i3status.conf``. See
+  :ref:`mailstatus_settings`.
+   
+   .. warning::
+      
+      Be sure to update your ``mailboxes`` setting accordingly.
+
+* Add :ref:`alsastatus_module` module.
 
 
 .. _py3status: https://github.com/ultrabug/py3status
