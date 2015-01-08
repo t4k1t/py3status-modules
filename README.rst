@@ -2,6 +2,8 @@
 py3status-modules
 =================
 
+.. |docs| image:: https://readthedocs.org/projects/py3status-modules/badge/?version=latest
+
 Collection of modules for py3status_.
 
 dependencies
