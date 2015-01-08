@@ -113,7 +113,7 @@ class Py3status:
         # Initialise Data class only once
         # TODO: parse settings in separate function for better error handling
         if not self.data:
-            self.data = Data(self.host, self.port, self.password)
+            self.data = Data()
 
         volume, mute = self.data.get_stats()
 
