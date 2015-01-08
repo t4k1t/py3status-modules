@@ -2,7 +2,7 @@
 py3status-modules
 =================
 
-.. |docs| image:: https://readthedocs.org/projects/py3status-modules/badge/?version=latest
+|docs|
 
 Collection of modules for py3status_.
 
@@ -64,3 +64,8 @@ You can find detailed documentation at
 .. _batti: https://code.google.com/p/batti-gtk/
 .. _Sphinx: http://sphinx-doc.org
 .. _ALSA: http://www.alsa-project.org/
+ 
+.. |docs| image:: https://readthedocs.org/projects/py3status-modules/badge/?version=latest
+   :alt: Documentation status
+   :scale: 100%
+   :target: https://readthedocs.org/projects/py3status-modules/
