@@ -1,0 +1,32 @@
+general {
+        colors = true
+        interval = 1
+        output_format = "i3bar"
+}
+
+order += "mailstatus"
+order += "run_watch DHCP"
+order += "batterystatus"
+order += "load"
+
+run_watch DHCP {
+        pidfile = "/var/run/dhcpcd*.pid"
+        format = "%title"
+}
+
+load {
+        format = "%1min"
+}
+
+mailstatus {
+        name = "✉"
+        cache_timeout = 5
+        mailboxes = "~/.mail/local ~/.mail/My\ Gmail\ Mailbox/Inbox"
+}
+
+batterystatus {
+        name = "⚡"
+        cache_timeout = 30
+        threshold = 15
+        format = "%bar %percentage% %time"
+}

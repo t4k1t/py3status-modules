@@ -23,10 +23,8 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """
 
-from configparser import SafeConfigParser, NoSectionError
 from datetime import timedelta
 from itertools import cycle
-from os import path
 import re
 from time import time
 
@@ -141,9 +139,14 @@ class Py3status:
 
     """This is where all the py3status magic happens."""
 
+    cache_timeout = 0
+    name = 'BATT:'
+    threshold = 15
+    format = '{bar} {percentage}%% {time}'
+    alt_format = '{time}'
+
     def __init__(self):
-        """Read config, add additional batteries."""
-        self.conf = self._read_config()
+        """Setup Data class, add additional batteries."""
         self.data = Data()
         batteries = self.data.update_batteries()
         battery_count = len(batteries)
@@ -151,30 +154,6 @@ class Py3status:
             setattr(Py3status, 'no_battery', True)
         elif battery_count > 1:
             setattr(Py3status, 'battery', self.batterystatus)
-
-    def _read_config(self):
-        """Read config file."""
-        conf = {}
-        config = SafeConfigParser({
-            'title': 'BAT:', 'order': '0', 'interval': '0', 'threshold': '15',
-            'format': '{bar} {percentage}%% {time}', 'alt_format': '{time}'})
-        config.read([path.expanduser('~/.i3/py3status/modules.ini')])
-        try:
-            conf['title'] = config.get('batterystatus', 'title')
-            conf['order'] = config.getint('batterystatus', 'order')
-            conf['interval'] = config.getint('batterystatus', 'interval')
-            conf['threshold'] = config.getint('batterystatus', 'threshold')
-            conf['format'] = config.get('batterystatus', 'format')
-            conf['alt_format'] = config.get('batterystatus', 'alt_format')
-        except NoSectionError:
-            conf['title'] = config.get('DEFAULT', 'title')
-            conf['order'] = config.getint('DEFAULT', 'order')
-            conf['interval'] = config.getint('DEFAULT', 'interval')
-            conf['threshold'] = config.getint('DEFAULT', 'threshold')
-            conf['format'] = config.get('DEFAULT', 'format')
-            conf['alt_format'] = config.get('DEFAULT', 'alt_format')
-
-        return conf
 
     def _get_bar(self, percent, steps):
         """Get power level representation in bar form."""
@@ -191,26 +170,23 @@ class Py3status:
 
     def batterystatus(self, json, i3status_config):
         """Return response for i3status bar."""
-        TITLE = self.conf['title']
-        INTERVAL = self.conf['interval']
-        ORDER = self.conf['order']
-        THRESHOLD = self.conf['threshold']
-        response = {'full_text': '{title} no battery'.format(title=TITLE),
+        response = {'full_text': '{title} no battery'.format(title=self.name),
                     'name': 'batterystatus'}
+        NAME = self.name
         try:
             self.no_battery
             response['color'] = i3status_config['color_degraded']
-            return (ORDER, response)
+            return response
         except AttributeError:
             pass
 
-        pformat = self.conf['format']
+        pformat = self.format
 
         info, supplied = self.data.get_state()
         supply = ""
         if supplied == 0:
             supply = "~"
-        TITLE += supply
+        NAME += supply
 
         _time = ""
         if info._time.total_seconds() > 0:
@@ -218,11 +194,11 @@ class Py3status:
 
         # Apply formatting to output.
         r_dict = {
-            '{percentage}': str(info._percentage),
-            '{state}': info._state,
-            '{onbattery}': supply,
-            '{time}': str(_time),
-            '{bar}': self._get_bar(info._percentage, 6),
+            '%percentage': str(info._percentage),
+            '%state': info._state,
+            '%onbattery': supply,
+            '%time': str(_time),
+            '%bar': self._get_bar(info._percentage, 6),
         }
         robj = re.compile('|'.join(r_dict.keys()))
         data = (robj.sub(lambda m: r_dict[m.group(0)], pformat)).strip()
@@ -232,13 +208,13 @@ class Py3status:
             response['color'] = i3status_config['color_good']
         if state == 'discharging':
             response['color'] = i3status_config['color_degraded']
-        if info._percentage <= THRESHOLD:
+        if info._percentage <= self.threshold:
             response['color'] = i3status_config['color_bad']
 
         response['full_text'] = (
             "{title} {data}".format(
-                title=TITLE, data=data))
+                title=NAME, data=data))
 
-        response['cached_until'] = time() + INTERVAL
+        response['cached_until'] = time() + self.cache_timeout
 
-        return (ORDER, response)
+        return response

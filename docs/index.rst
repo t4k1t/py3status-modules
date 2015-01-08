@@ -16,6 +16,7 @@ Contents:
    modules
    installation
    configuration
+   changelog
 
 
 Indices and tables

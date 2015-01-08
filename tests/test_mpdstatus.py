@@ -2,7 +2,6 @@
 
 import pytest
 import mock
-import os
 
 
 MPD = False
@@ -12,7 +11,7 @@ try:
 except ImportError:
     pass
 else:
-    from mpdstatus.mpdstatus import Data, MPDstatusException, Py3status
+    from mpdstatus.mpdstatus import Data, MPDstatusException
     MPD = True
 
 
@@ -97,93 +96,3 @@ class TestData:
         assert artist == "Best Artist"
         assert title == "Best Song"
         assert state == "play"
-
-
-@pytest.mark.skipif(not MPD, reason="requires python-mpd2")
-class TestResponse:
-
-    """Test Py3status class."""
-
-    @mock.patch('mpd.MPDClient')
-    @mock.patch('mpd.MPDClient.connect')
-    def test_empty_config(self, mock_connect, mock_client, monkeypatch,
-                          empty_config, i3config):
-        """Test config without mpdstatus section."""
-        def mockreturn(path):
-            path_string = (empty_config.dirname + "/" +
-                           empty_config.basename + "/modules.ini")
-            return path_string
-        monkeypatch.setattr(os.path, 'expanduser', mockreturn)
-
-        py3status = Py3status()
-        assert py3status is not None
-
-    @mock.patch('mpd.MPDClient')
-    @mock.patch('mpd.MPDClient.connect')
-    def test_valid_config(self, mock_connect, mock_client, monkeypatch,
-                          valid_config_path, i3config,
-                          mpdstatus_response_disconnected):
-        """Test valid config."""
-        monkeypatch.setattr(os.path, 'expanduser', lambda x:
-                            valid_config_path)
-        reference = mpdstatus_response_disconnected
-
-        py3status = Py3status()
-        module = py3status.mpdstatus(mock.Mock(), i3config)
-        assert module[1]['color'] == reference['color']
-        assert module[1]['full_text'] == reference['full_text']
-        assert module[1]['name'] == reference['name']
-
-    @mock.patch('mpd.MPDClient')
-    @mock.patch('mpd.MPDClient.connect')
-    def test_playing(self, mock_connect, mock_client, current_song,
-                     mpd_state_play, monkeypatch, valid_config_path, i3config,
-                     mpdstatus_response_playing):
-        """Test playback response with running MPD."""
-        monkeypatch.setattr(os.path, 'expanduser', lambda x:
-                            valid_config_path)
-        reference = mpdstatus_response_playing
-
-        py3status = Py3status()
-        py3status.data.client = mock.Mock(currentsong=current_song,
-                                          status=mpd_state_play)
-        module = py3status.mpdstatus(mock.Mock(), i3config)
-        assert module[1]['color'] == reference['color']
-        assert module[1]['full_text'] == reference['full_text']
-        assert module[1]['name'] == reference['name']
-
-    @mock.patch('mpd.MPDClient')
-    @mock.patch('mpd.MPDClient.connect')
-    def test_paused(self, mock_connect, mock_client, current_song,
-                    mpd_state_pause, monkeypatch, valid_config_path, i3config,
-                    mpdstatus_response_paused):
-        """Test playback response with paused MPD."""
-        monkeypatch.setattr(os.path, 'expanduser', lambda x:
-                            valid_config_path)
-        reference = mpdstatus_response_paused
-
-        py3status = Py3status()
-        py3status.data.client = mock.Mock(currentsong=current_song,
-                                          status=mpd_state_pause)
-        module = py3status.mpdstatus(mock.Mock(), i3config)
-        assert module[1]['color'] == reference['color']
-        assert module[1]['full_text'] == reference['full_text']
-        assert module[1]['name'] == reference['name']
-
-    @mock.patch('mpd.MPDClient')
-    @mock.patch('mpd.MPDClient.connect')
-    def test_stopped(self, mock_connect, mock_client, current_song,
-                     mpd_state_stop, monkeypatch, valid_config_path, i3config,
-                     mpdstatus_response_stopped):
-        """Test playback response with stopped playback."""
-        monkeypatch.setattr(os.path, 'expanduser', lambda x:
-                            valid_config_path)
-        reference = mpdstatus_response_stopped
-
-        py3status = Py3status()
-        py3status.data.client = mock.Mock(currentsong=current_song,
-                                          status=mpd_state_stop)
-        module = py3status.mpdstatus(mock.Mock(), i3config)
-        assert 'color' not in module[1]
-        assert module[1]['full_text'] == reference['full_text']
-        assert module[1]['name'] == reference['name']

@@ -10,38 +10,37 @@ Fetch the latest sources from github_:
 
 .. code-block:: bash
 
-   $ wget https://github.com/tablet-mode/py3status-modules/archive/0.2.0.tar.gz
+   $ wget https://github.com/tablet-mode/py3status-modules/archive/0.3.0.tar.gz
 
 #. Unpack the sources:
 
    .. code-block:: bash
 
-      $ tar xvzf 0.2.0.tar.gz
+      $ tar xvzf 0.3.0.tar.gz
 
 #. Enter source directory and copy the modules you want to use to your
    ``py3status`` folder:
 
    .. code-block:: bash
 
-      $ cd py3status-modules-0.2.0
+      $ cd py3status-modules-0.3.0
       $ cp batterystatus/batterystatus.py ~/.i3/py3status/
       $ cp mailstatus/mailstatus.py ~/.i3/py3status/
 
-#. Then rename and copy the example config to your ``py3status`` directory:
-
-   .. code-block:: bash
-
-      $ cp modules.ini.example ~/.i3/py3status/modules.ini
-
-#. Adjust the ``modules.ini`` you just copied with your editor of choice:
+#. Adjust your ``i3status.conf`` with your editor of choice to configure your
+   new modules accordingly:
 
    .. code-block:: bash
 
       # e.g.
-      $ vi ~/.i3/py3status/modules.ini
+      $ vi ~/.i3/i3status.conf
 
    See :ref:`configuration` for an explanation of the configuration format and an
    example.
+
+   .. seealso::
+
+      `Loading a py3status module <https://github.com/ultrabug/py3status/wiki/Load-and-order-py3status-modules-directly-from-your-current-i3status-config#loading-a-py3status-module>`_ from py3status' documentation.
 
 
 Distribution Specific
@@ -56,7 +55,7 @@ After installing ``py3status-modules`` you will have to put symlinks to the
 modules you want to use into your ``py3status`` directory:
 
    .. code-block:: bash
-      
+
       $ cd ~/.i3/py3status
       $ ln -s /usr/share/py3status-modules/batterystatus.py
       $ ln -s /usr/share/py3status-modules/mailstatus.py
@@ -64,15 +63,14 @@ modules you want to use into your ``py3status`` directory:
 Alternatively you can also just copy the modules, but than you will have to
 remember to copy them again after each update.
 
-Finally copy and adjust the ``modules.ini``:
+Finally adjust your ``i3status.conf``:
 
-   .. code-block:: bash
-      
-      $ cp /usr/share/doc/py3status-modules-0.2.0/modules.ini.example \
-         ~/.i3/py3status/modules.ini
-   
 See :ref:`configuration` for an explanation of the configuration format and an
 example.
+
+   .. seealso::
+
+      `Loading a py3status module <https://github.com/ultrabug/py3status/wiki/Load-and-order-py3status-modules-directly-from-your-current-i3status-config#loading-a-py3status-module>`_ from py3status' documentation.
 
 
 .. _github: https://github.com

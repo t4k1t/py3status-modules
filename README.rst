@@ -8,10 +8,13 @@ dependencies
 ============
 
 - python (>=3.2)
-- py3status (>=1.1)
+- py3status (>=2.0)
+
+- task (>=2.1.2) ``taskstatus``
 - python-mpd (>=0.5.1) ``mpdstatus``
 - upower (>=0.9.23) ``batterystatus``
 - dbus-python (>=1.2.0) ``batterystatus``
+- alsa-utils (>=1.0.28) ``alsastatus``
 
 
 modules
@@ -31,45 +34,18 @@ modules
   upower support batterystatus uses slightly modified code of the batti_
   project.
 
+- ``alsastatus`` shows the current volume of a configurable ALSA_ mixer. Also, middle
+  click will mute/unmute said mixer.
+
 
 configuration
 =============
 
-You can configure each module in `~/.i3/py3status/modules.ini`::
+Since py3status-modules 0.3.0 you can configure each module directly in your `i3status.conf`.
 
-    [mailstatus]
-    ;title = ✉
-    ; where to put module output (can be between stock i3status ones)
-    order = 0
-    ; refresh interval in seconds
-    interval = 0
-    ; list of mailboxes in quotes, separated by whitespace
-    ;mailboxes = '/path/to/mailbox' '/path/to/another/mailbox'
-
-    [taskstatus]
-    ;title = ✓
-    order = 1
-    interval = 120
-
-    [mpdstatus]
-    ;title = ♬
-    order = 2
-    interval = 0
-    ;host = 'localhost'
-    ;port = 6600
-    ;password =
-
-    [batterystatus]
-    ;title = ⚡
-    order = 9
-    interval = 2
-    threshold = 15
-    ; output format; possible values:
-    ;  {bar}          Bar representation of current charge
-    ;  {percentage}   Current charge in percent
-    ;  {time}         Remaining time (until empty/full)
-    ;  {state}        Battery state (charing, discharging, full)
-    format = {bar} {percentage}%% {time}
+See `the configuration section of py3status-modules' documentation
+<https://py3status-modules.readthedocs.org/en/latest/configuration.html>`_ for
+an explanation and examples.
 
 
 documentation
@@ -85,3 +61,4 @@ You can find detailed documentation at
 .. _Taskwarrior: http://taskwarrior.org/
 .. _batti: https://code.google.com/p/batti-gtk/
 .. _Sphinx: http://sphinx-doc.org
+.. _ALSA: http://www.alsa-project.org/
