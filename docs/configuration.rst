@@ -161,6 +161,9 @@ alsastatus settings
    Symbol which indicates that the mixer is currently muted. **Defaults to
    ``[M]``**
 
+``step``
+   Stepsize by which to decrease/increase volume. **Defaults to 3**
+
 Example
 '''''''
 
@@ -176,6 +179,7 @@ The following example will:
            name = "♪"
            cache_timeout = 0
            indicator = "[M]"
+           step = 3
    }
 
 

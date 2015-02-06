@@ -72,7 +72,7 @@ class Data:
         self.volume = out[-1].split()[3].strip(b'[]').decode('utf-8')  # whut?
 
         mute_str = out[-1].split()[5].strip(b'[]').decode('utf-8')  # whut?
-        self.mute = True if mute_str == "off" else False
+        self.mute = mute_str == "off"
 
         return self.volume, self.mute
 
@@ -84,6 +84,7 @@ class Py3status:
     cache_timeout = 0
     name = 'ALSA:'
     mixer = 'Master'
+    step = 3
     indicator = '[M]'
 
     def __init__(self):
@@ -98,7 +99,7 @@ class Py3status:
         """Handle mouse clicks."""
         # Left click: Decrease volume
         if event['button'] == 1:
-            self.data.decrease_volume()
+            self.data.decrease_volume(self.step)
 
         # Middle click: Mute/Unmute
         elif event['button'] == 2:
@@ -106,7 +107,7 @@ class Py3status:
 
         # Right click: Increase volume
         elif event['button'] == 3:
-            self.data.increase_volume()
+            self.data.increase_volume(self.step)
 
     def alsastatus(self, json, i3status_config):
         """Return response for i3status bar."""
