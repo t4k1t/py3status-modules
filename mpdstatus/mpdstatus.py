@@ -23,6 +23,7 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """
 
+from os import path
 from time import time
 
 from mpd import MPDClient, CommandError
@@ -113,12 +114,17 @@ class Data:
 
     def get_stats(self):
         """Return artist, songtitle and playback state."""
-        song = self._crop_text(self.client.currentsong())
+        title = "Unknown Title"
+        song = self.client.currentsong()
         status = self.client.status()
         artist = self._crop_text(
             song['artist']) if 'artist' in song else "Unknown Artist"
+        if 'title' in song:
+            title = self._crop_text(song['title'])
+        elif 'file' in song:
+            title = self._crop_text(path.basename(song['file']))
 
-        return artist, song['title'], status['state']
+        return artist, title, status['state']
 
 
 class Py3status:
