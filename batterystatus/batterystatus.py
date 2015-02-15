@@ -163,7 +163,7 @@ class Py3status:
         for i in range(0, percent, part):
             bar += "#"
         for j in range((len(bar) - 1), steps):
-            bar += "."
+            bar += "_"
         bar += "]"
 
         return bar
