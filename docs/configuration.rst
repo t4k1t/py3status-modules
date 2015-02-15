@@ -19,6 +19,9 @@ Some basic settings can be configured for any module:
 ``cache_timeout``
    Refresh interval in seconds.
 
+``error_timeout``
+   Time after which error messages are cleared from the output in seconds.
+
 .. _mailstatus_settings:
 
 mailstatus settings

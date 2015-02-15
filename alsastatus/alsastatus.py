@@ -23,6 +23,21 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 from subprocess import check_output, CalledProcessError, STDOUT
 from time import time
+# TODO
+# * Add workaround for cards which cannot mute/unmute mixers
+
+
+class AlsastatusException(Exception):
+
+    """Custom taskstatus exception."""
+
+    def __init__(self, exception):
+        """Initialisation."""
+        self.exception = exception
+
+    def __str__(self):
+        """Prepend message with 'alsastatus: '."""
+        return "alsastatus: {exception}".format(exception=self.exception)
 
 
 class Data:
@@ -34,40 +49,77 @@ class Data:
         self.volume = "-"
         self.mute = False
         self.mixer = mixer
+        self.error = (None, None)
 
     def decrease_volume(self, step=3):
         """Decrease volume."""
-        check_output(
-            ["amixer", "-q", "sset", self.mixer, "{}-".format(step)],
-            stderr=STDOUT)
+        self.error = (None, None)
+
+        try:
+            check_output(
+                ["amixer", "-q", "sset", self.mixer, "{}-".format(step)])
+        except CalledProcessError as e:
+            msg = "failed to decrease volume"
+            self.error = (msg, time())
+            raise AlsastatusException(msg + ": {}".format(str(e.output)))
 
     def increase_volume(self, step=3):
         """Increase volume."""
-        check_output(
-            ["amixer", "-q", "sset", self.mixer, "{}+".format(step)],
-            stderr=STDOUT)
+        self.error = (None, None)
+
+        try:
+            check_output(
+                ["amixer", "-q", "sset", self.mixer, "{}+".format(step)],
+                stderr=STDOUT)
+        except CalledProcessError as e:
+            msg = "failed to increase volume"
+            self.error = (msg, time())
+            raise AlsastatusException(msg + ": {}".format(str(e.output)))
 
     def toggle_mute(self):
         """Toggle mute."""
+        self.error = (None, None)
+
         out = check_output(
             ["amixer", "get", self.mixer], stderr=STDOUT).splitlines()
         mute = out[-1].split()[5].strip(b'[]').decode('utf-8')  # whut?
 
         if mute == "on":
-            check_output(
-                ["amixer", "-q", "sset", self.mixer, "mute"],
-                stderr=STDOUT)
-            self.mute = True
+            try:
+                check_output(
+                    ["amixer", "-q", "sset", self.mixer, "mute"],
+                    stderr=STDOUT)
+            except CalledProcessError as e:
+                msg = "failed to mute mixer"
+                self.error = (msg, time())
+                raise AlsastatusException(msg + ": {}".format(str(e.output)))
+            else:
+                self.mute = True
         else:
-            check_output(
-                ["amixer", "-q", "sset", self.mixer, "unmute"],
-                stderr=STDOUT)
-            self.mute = False
+            try:
+                check_output(
+                    ["amixer", "-q", "sset", self.mixer, "unmute"],
+                    stderr=STDOUT)
+            except CalledProcessError:
+                msg = "failed to unmute mixer"
+                self.error = (msg, time())
+                raise AlsastatusException(msg + ": {}".format(str(e.output)))
+            else:
+                self.mute = False
 
     def get_stats(self):
         """Return volume and mute status."""
-        out = check_output(
-            ["amixer", "get", self.mixer], stderr=STDOUT).splitlines()
+        try:
+            out = check_output(
+                ["amixer", "get", self.mixer], stderr=STDOUT).splitlines()
+        except CalledProcessError as e:
+            msg = "failed to get mixer state"
+            self.error = (msg, time())
+            raise AlsastatusException(msg + ": {}".format(str(e.output)))
+        except OSError as e:
+            msg = "failed to execute amixer"
+            self.error = (msg, time())
+            raise AlsastatusException(msg + ": {}".format(str(e)))
 
         self.volume = out[-1].split()[3].strip(b'[]').decode('utf-8')  # whut?
 
@@ -82,6 +134,7 @@ class Py3status:
     """This is where all the py3status magic happens."""
 
     cache_timeout = 0
+    error_timeout = 10
     name = 'ALSA:'
     mixer = 'Master'
     step = 3
@@ -116,16 +169,27 @@ class Py3status:
         if not self.data:
             self.data = Data()
 
-        volume, mute = self.data.get_stats()
-
         response = {'full_text': '', 'name': 'alsastatus'}
-        response['full_text'] = "{title} {volume}".format(
-            title=self.name, volume=volume)
 
-        if mute:
-            response['full_text'] = "{title} {mute} {volume}".format(
-                title=self.name, mute=self.indicator, volume=volume)
-            response['color'] = i3status_config['color_degraded']
+        # Reset error message
+        if (self.data.error[0] and
+                self.data.error[1] + self.error_timeout < time()):
+            self.data.error = (None, None)
+
+        if not self.data.error[0]:
+            volume, mute = self.data.get_stats()
+
+            response['full_text'] = "{title} {volume}".format(
+                title=self.name, volume=volume)
+
+            if mute:
+                response['full_text'] = "{title} {mute} {volume}".format(
+                    title=self.name, mute=self.indicator, volume=volume)
+                response['color'] = i3status_config['color_degraded']
+        else:
+            response['full_text'] = "{title} {error}".format(
+                title=self.name, error=self.data.error[0])
+            response['color'] = i3status_config['color_bad']
 
         response['cached_until'] = time() + self.cache_timeout
 
