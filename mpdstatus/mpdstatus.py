@@ -46,12 +46,13 @@ class Data:
 
     """Aquire data."""
 
-    def __init__(self, host, port, password):
+    def __init__(self, host, port, password, max_length):
         """Initialise MPD client."""
         self.count = 0
         self.HOST = host
         self.PORT = port
         self.PW = password
+        self.MAX_LENGTH = max_length
         self.client = MPDClient()
         self._connect()
 
@@ -117,12 +118,13 @@ class Data:
         title = "Unknown Title"
         song = self.client.currentsong()
         status = self.client.status()
+        length = self.MAX_LENGTH
         artist = self._crop_text(
-            song['artist']) if 'artist' in song else "Unknown Artist"
+            song['artist'], length) if 'artist' in song else "Unknown Artist"
         if 'title' in song:
-            title = self._crop_text(song['title'])
+            title = self._crop_text(song['title'], length)
         elif 'file' in song:
-            title = self._crop_text(path.basename(song['file']))
+            title = self._crop_text(path.basename(song['file']), length)
 
         return artist, title, status['state']
 
@@ -136,6 +138,7 @@ class Py3status:
     host = 'localhost'
     port = 6600
     password = ''
+    max_length = 32
 
     def __init__(self):
         """Initialisation."""
