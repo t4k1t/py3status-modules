@@ -56,8 +56,10 @@ class Data:
         self.client = MPDClient()
         self._connect()
 
-    def _crop_text(self, text, length=32):
+    def _crop_text(self, text, length):
         """Crop string to specified length."""
+        if not length:
+            return text
         if len(text) > length:
             text = "{}...".format(text[:length])
 
@@ -138,7 +140,7 @@ class Py3status:
     host = 'localhost'
     port = 6600
     password = ''
-    max_length = 32
+    max_length = None
 
     def __init__(self):
         """Initialisation."""
@@ -167,7 +169,8 @@ class Py3status:
         # Initialise Data class only once
         # TODO: parse settings in separate function for better error handling
         if not self.data:
-            self.data = Data(self.host, self.port, self.password)
+            self.data = Data(self.host, self.port, self.password,
+                             self.max_length)
 
         connection = self.data.has_connection()
 

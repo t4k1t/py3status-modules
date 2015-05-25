@@ -91,6 +91,9 @@ mpdstatus settings
 ``password``
    If you set up your MPD to use a password you can set it here.
 
+``max_length``
+   Crop output to this number of characters. **No cropping per default**
+
 Example
 '''''''
 
