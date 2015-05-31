@@ -191,3 +191,19 @@ class Py3status:
         response['cached_until'] = time() + self.cache_timeout
 
         return response
+
+
+if __name__ == "__main__":
+    """
+    Test this module by calling it directly.
+    """
+    from time import sleep
+    x = Py3status()
+    config = {
+        'color_good': '#00FF00',
+        'color_bad': '#FF0000',
+        'color_degraded': '#FFFF00',
+    }
+    while True:
+        print(x.mpdstatus([], config))
+        sleep(1)
