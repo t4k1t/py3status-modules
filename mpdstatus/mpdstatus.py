@@ -75,8 +75,7 @@ class Data:
             if "incorrect password" in str(e).lower():
                 raise MPDstatusException("incorrect password")
         except ConnectionRefusedError:
-            # This is handled elsewhere by displaying the text `not connected`
-            # in the status bar.
+            # This is handled elsewhere by displaying the text `disconnected`
             pass
 
     def disconnect(self):
@@ -187,7 +186,7 @@ class Py3status:
         else:
             self.data.reconnect()
             response['color'] = i3status_config['color_bad']
-            response['full_text'] = "%s not connected" % (self.name)
+            response['full_text'] = "%s disconnected" % (self.name)
 
         response['cached_until'] = time() + self.cache_timeout
 
