@@ -141,8 +141,25 @@ class Py3status:
     indicator = '[M]'
 
     def __init__(self):
-        """Read config and initialise Data class."""
+        """Initialise Data class."""
         self.data = None
+
+    def _validate_config(self):
+        """Validate configuration."""
+        msg = []
+
+        if type(self.error_timeout) != int or self.error_timeout < 0:
+            msg.append("invalid error_timeout")
+        if type(self.step) != int or self.step < 1 or self.step > 99:
+            msg.append("invalid step")
+        if type(self.name) != str:
+            msg.append("invalid name")
+        if type(self.mixer) != str or len(self.mixer) < 1:
+            msg.append("invalid mixer")
+
+        if msg:
+            self.data.error = ("configuration error: {}".format(
+                ", ".join(msg)), -1)
 
     def kill(self, json, i3status_config, event):
         """Handle termination."""
@@ -165,15 +182,17 @@ class Py3status:
     def alsastatus(self, json, i3status_config):
         """Return response for i3status bar."""
         # Initialise Data class only once
-        # TODO: parse settings in separate function for better error handling
         if not self.data:
             self.data = Data()
+            self._validate_config()
 
         response = {'full_text': '', 'name': 'alsastatus'}
 
         # Reset error message
+        # -1 means we can't recover from this error
         if (self.data.error[0] and
-                self.data.error[1] + self.error_timeout < time()):
+                (self.data.error[1] + self.error_timeout < time() and
+                    self.data.error[1] != -1)):
             self.data.error = (None, None)
 
         if not self.data.error[0]:
