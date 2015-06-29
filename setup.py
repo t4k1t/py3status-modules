@@ -13,7 +13,7 @@ with codecs.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name="py3status-modules",
 
-    version='0.3.1',
+    version='0.4.0',
 
     description="Collection of modules for py3status",
 

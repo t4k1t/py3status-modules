@@ -1,6 +1,6 @@
 # Maintainer: Tablet Mode <tablet-mode@monochromatic.cc>
 pkgname=py3status-modules
-pkgver=0.3.0
+pkgver=0.4.0
 pkgrel=1
 pkgdesc="Collection of modules for py3status"
 arch=('i686' 'x86_64')

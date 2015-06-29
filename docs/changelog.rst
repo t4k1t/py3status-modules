@@ -3,6 +3,18 @@
 Changelog
 =========
 
+0.4.0
+-----
+
+* Add config validation to all modules.
+
+* Add better error handling mechanism to all modules.
+
+* `alsastatus`: Make ``stepsize`` configurable.
+
+* `mpdstatus`: Fix output on unknown song title.
+
+
 0.3.0
 -----
 
