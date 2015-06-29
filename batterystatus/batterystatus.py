@@ -58,6 +58,7 @@ class Data:
 
     def __init__(self):
         """Initialise dbus loop."""
+        self.error = (None, None)
         DBusGMainLoop(set_as_default=True)
         try:
             self.__bus = dbus.SystemBus()
@@ -140,6 +141,7 @@ class Py3status:
     """This is where all the py3status magic happens."""
 
     cache_timeout = 0
+    error_timeout = 10
     name = 'BATT:'
     threshold = 15
     format = '{bar} {percentage}%% {time}'
@@ -154,6 +156,20 @@ class Py3status:
             setattr(Py3status, 'no_battery', True)
         elif battery_count > 1:
             setattr(Py3status, 'battery', self.batterystatus)
+
+    def _validate_config(self):
+        """Validate configuration."""
+        msg = []
+
+        if type(self.name) != str:
+            msg.append("invalid name")
+        if type(self.threshold) != int or self.threshold < 1\
+                or self.threshold > 100:
+            msg.append("invalid threshold")
+
+        if msg:
+            self.data.error = ("configuration error: {}".format(
+                ", ".join(msg)), -1)
 
     def _get_bar(self, percent, steps):
         """Get power level representation in bar form."""
@@ -170,9 +186,17 @@ class Py3status:
 
     def batterystatus(self, json, i3status_config):
         """Return response for i3status bar."""
+        # Reset error message
+        # -1 means we can't recover from this error
+        if (self.data.error[0] and
+                (self.data.error[1] + self.error_timeout < time() and
+                    self.data.error[1] != -1)):
+            self.data.error = (None, None)
+
         response = {'full_text': '{title} no battery'.format(title=self.name),
                     'name': 'batterystatus'}
         NAME = self.name
+
         try:
             self.no_battery
             response['color'] = i3status_config['color_degraded']
@@ -211,9 +235,14 @@ class Py3status:
         if info._percentage <= self.threshold:
             response['color'] = i3status_config['color_bad']
 
-        response['full_text'] = (
-            "{title} {data}".format(
-                title=NAME, data=data))
+        if not self.data.error[0]:
+            response['full_text'] = (
+                "{title} {data}".format(
+                    title=NAME, data=data))
+        else:
+            response['full_text'] = "{title} {error}".format(
+                title=NAME, error=self.data.error[0])
+            response['color'] = i3status_config['color_bad']
 
         response['cached_until'] = time() + self.cache_timeout
 

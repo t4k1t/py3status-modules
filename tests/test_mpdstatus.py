@@ -30,7 +30,7 @@ class TestData:
         """Test Data initialisation with incorrect password."""
         data = None
         with pytest.raises(MPDstatusException) as e:
-            data = Data('', 6600, "")
+            data = Data('', 6600, "", None)
         assert "incorrect password" in str(e)
         assert data is None
 
@@ -39,7 +39,7 @@ class TestData:
     def test_connection(self, mock_connection, mock_status):
         """Test MPD connection check."""
         data = None
-        data = Data('', 6600, "")
+        data = Data('', 6600, "", None)
         assert data.has_connection() is True
 
         mock_status.side_effect = Exception
@@ -52,7 +52,7 @@ class TestData:
     def test_controls(self, mock_prev, mock_next, mock_pause, mock_connection):
         """Check control commands."""
         data = None
-        data = Data('', 6600, "")
+        data = Data('', 6600, "", None)
 
         data.previous()
         data.next()
@@ -63,7 +63,7 @@ class TestData:
     def test_controls_fail(self, mock_connection):
         """Check control commands without MPD connection."""
         data = None
-        data = Data('', 6600, "")
+        data = Data('', 6600, "", None)
 
         with pytest.raises(mpd.ConnectionError):
             data.previous()
@@ -77,7 +77,7 @@ class TestData:
     def test_reconnect_fail(self, mock_connection):
         """Check reconnecting without MPD connection."""
         data = None
-        data = Data('', 6600, "")
+        data = Data('', 6600, "", None)
         assert data is not None
 
         data.reconnect()
@@ -89,7 +89,7 @@ class TestData:
                        mpd_state_play):
         """Test playback information retrieval."""
         data = None
-        data = Data('', 6600, "")
+        data = Data('', 6600, "", None)
         data.client = mock.Mock(currentsong=current_song,
                                 status=mpd_state_play)
         artist, title, state = data.get_stats()

@@ -43,6 +43,10 @@ class Data:
 
     """Aquire data."""
 
+    def __init__(self):
+        """Initialise."""
+        self.error = (None, None)
+
     def get_tasks(self):
         """Return number of open and overdue tasks as tuple."""
         tasks = 0
@@ -69,6 +73,7 @@ class Py3status:
     """Called by py3status."""
 
     cache_timeout = 0
+    error_timeout = 10
     name = 'TASK:'
     data = None
 
@@ -81,9 +86,27 @@ class Py3status:
             raise TaskstatusException("failed to execute 'task'")
         self.data = Data()
 
+    def _validate_config(self):
+        """Validate configuration."""
+        msg = []
+
+        if type(self.name) != str:
+            msg.append("invalid name")
+
+        if msg:
+            self.data.error = ("configuration error: {}".format(
+                ", ".join(msg)), -1)
+
     def taskstatus(self, json, i3status_config):
         """Return response for py3status."""
         response = {'full_text': '', 'name': 'taskstatus'}
+
+        # Reset error message
+        # -1 means we can't recover from this error
+        if (self.data.error[0] and
+                (self.data.error[1] + self.error_timeout < time() and
+                    self.data.error[1] != -1)):
+            self.data.error = (None, None)
 
         tasks, overdue = self.data.get_tasks()
 

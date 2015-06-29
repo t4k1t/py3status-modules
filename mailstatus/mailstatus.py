@@ -48,6 +48,7 @@ class Data:
     def __init__(self, mailboxes):
         """Initialisation."""
         self.read_mailboxes(mailboxes)
+        self.error = (None, None)
 
     def read_mailboxes(self, mailboxes):
         """Return list of mailboxes.
@@ -126,6 +127,7 @@ class Py3status:
     """This is where all the py3status magic happens."""
 
     cache_timeout = 10
+    error_timeout = 10
     name = 'MAIL:'
     mailboxes = ''
 
@@ -133,15 +135,32 @@ class Py3status:
         """Initialisation."""
         self.data = None
 
+    def _validate_config(self):
+        """Validate configuration."""
+        msg = []
+
+        if type(self.name) != str:
+            msg.append("invalid name")
+
+        if msg:
+            self.data.error = ("configuration error: {}".format(
+                ", ".join(msg)), -1)
+
     def mailstatus(self, json, i3status_config):
         """Return response for i3status bar."""
         response = {'full_text': ''}
 
         # use split from the shlex lib here because it allows you to escape
         # whitespaces
-        # TODO: parse mailboxes in separate function for better error handling
         if not self.data:
             self.data = Data(split(self.mailboxes))
+
+        # Reset error message
+        # -1 means we can't recover from this error
+        if (self.data.error[0] and
+                (self.data.error[1] + self.error_timeout < time() and
+                    self.data.error[1] != -1)):
+            self.data.error = (None, None)
 
         unread = self.data.get_unread()
 

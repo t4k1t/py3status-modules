@@ -53,6 +53,7 @@ class Data:
         self.PORT = port
         self.PW = password
         self.MAX_LENGTH = max_length
+        self.error = (None, None)
         self.client = MPDClient()
         self._connect()
 
@@ -135,6 +136,7 @@ class Py3status:
     """This is where all the py3status magic happens."""
 
     cache_timeout = 0
+    error_timeout = 10
     name = 'MPD:'
     host = 'localhost'
     port = 6600
@@ -144,6 +146,21 @@ class Py3status:
     def __init__(self):
         """Initialisation."""
         self.data = None
+
+    def _validate_config(self):
+        """Validate configuration."""
+        msg = []
+
+        if type(self.name) != str:
+            msg.append("invalid name")
+        if type(self.port) != int or self.port < 1 or self.port > 65535:
+            msg.append("invalid port")
+        if type(self.max_length) != int or self.max_length < 1:
+            msg.append("invalid max_length")
+
+        if msg:
+            self.data.error = ("configuration error: {}".format(
+                ", ".join(msg)), -1)
 
     def kill(self, json, i3status_config, event):
         """Handle termination."""
@@ -166,10 +183,16 @@ class Py3status:
         response = {'full_text': '', 'name': 'mpdstatus'}
 
         # Initialise Data class only once
-        # TODO: parse settings in separate function for better error handling
         if not self.data:
             self.data = Data(self.host, self.port, self.password,
                              self.max_length)
+
+        # Reset error message
+        # -1 means we can't recover from this error
+        if (self.data.error[0] and
+                (self.data.error[1] + self.error_timeout < time() and
+                    self.data.error[1] != -1)):
+            self.data.error = (None, None)
 
         connection = self.data.has_connection()
 
