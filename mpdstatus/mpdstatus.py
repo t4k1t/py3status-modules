@@ -128,7 +128,7 @@ class Data:
         elif 'file' in song:
             title = self._crop_text(path.basename(song['file']), length)
 
-        return artist, title, status['state']
+        return artist, title, status.get('state', "unknown")
 
 
 class Py3status:
