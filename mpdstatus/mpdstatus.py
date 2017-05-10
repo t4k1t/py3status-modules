@@ -85,9 +85,11 @@ class Data:
             self.client.close()
             self.client.disconnect()
         except:
-            # If this happens, the client is most likely already disconnected
-            # anyway.
-            pass
+            # After long idle periods the client reaches a state where mpd2
+            # is neither able to disconnect nor to reconnect anymore. Calling
+            # `_reset` seems to remove the socket and make a new connection
+            # attempt possible.
+            self.client._reset()
 
     def reconnect(self):
         """Try to reaquire MPD connection."""
