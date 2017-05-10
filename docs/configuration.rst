@@ -94,6 +94,12 @@ mpdstatus settings
 ``max_length``
    Crop output to this number of characters. **No cropping per default**
 
+``hide_on_pause``
+   If set to `true` normal output will be suppressed on pause and only the
+   module ``name`` (per default ``♬``) will be displayed in order to maintain
+   mouse controls in the status bar. ``mpdstatus``' output will be hidden until
+   playback is unpaused again.
+
 Example
 '''''''
 
@@ -104,6 +110,7 @@ The following example will:
 * Connect to the host ``mympdserver``
 * on Port ``6600``
 * using the password ``correcthorsebatterystaple``
+* Enable the ``hide_on_pause`` feature
 
 .. code-block:: bash
 
@@ -113,6 +120,7 @@ The following example will:
            host = "localhost"
            port = 6600
            password = "correcthorsebatterystaple"
+           hide_on_pause = true
    }
 
 

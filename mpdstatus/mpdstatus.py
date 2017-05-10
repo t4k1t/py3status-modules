@@ -144,6 +144,7 @@ class Py3status:
     port = 6600
     password = ''
     max_length = None
+    hide_on_pause = False
 
     def __init__(self):
         """Initialisation."""
@@ -201,13 +202,16 @@ class Py3status:
         if connection:
             artist, songtitle, state = self.data.get_stats()
 
+            response['full_text'] = "%s %s - %s" % \
+                (self.name, artist, songtitle)
+
             if state == 'play':
                 response['color'] = i3status_config['color_good']
             elif state == 'pause':
                 response['color'] = i3status_config['color_degraded']
+                if self.hide_on_pause is True:
+                    response['full_text'] = self.name
 
-            response['full_text'] = "%s %s - %s" % \
-                (self.name, artist, songtitle)
         else:
             self.data.reconnect()
             response['color'] = i3status_config['color_bad']

@@ -3,6 +3,12 @@
 Changelog
 =========
 
+0.5.0
+-----
+
+* `mpdstatus`: Add ``hide_on_pause`` setting which allows to hide
+  ``mpdstatus`` output while playback is paused.
+
 0.4.0
 -----
 
