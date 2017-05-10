@@ -48,7 +48,6 @@ class Data:
 
     def __init__(self, host, port, password, max_length):
         """Initialise MPD client."""
-        self.count = 0
         self.HOST = host
         self.PORT = port
         self.PW = password
