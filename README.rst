@@ -58,12 +58,26 @@ You can find detailed documentation at
 <https://py3status-modules.readthedocs.org/en/latest/>`_, powered by Sphinx_.
 
 
+tests
+=====
+
+Tests have been written using pytest_. Personally I'd recommend installing
+pytest, coverage_ and tox_ and then running the tests via tox_: ::
+
+   $ tox
+
+Which should print a nice coverage report if everything goes well.
+
+
 .. _MPD: http://www.musicpd.org/
 .. _py3status: https://github.com/ultrabug/py3status
 .. _Taskwarrior: http://taskwarrior.org/
 .. _batti: https://code.google.com/p/batti-gtk/
 .. _Sphinx: http://sphinx-doc.org
 .. _ALSA: http://www.alsa-project.org/
+.. _pytest: https://docs.pytest.org/
+.. _coverage: https://coverage.readthedocs.io/
+.. _tox: https://tox.readthedocs.io/
  
 .. |docs| image:: https://readthedocs.org/projects/py3status-modules/badge/?version=latest
    :alt: Documentation status
