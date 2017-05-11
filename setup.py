@@ -13,7 +13,7 @@ with codecs.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name="py3status-modules",
 
-    version='0.4.0',
+    version='0.5.0',
 
     description="Collection of modules for py3status",
 
@@ -23,7 +23,7 @@ setup(
     url='https://www.github.com/tablet-mode/py3status-modules',
 
     # Author details
-    author='Tablet Mode',
+    author='Thomas Kager',
     author_email='tablet-mode@monochromatic.cc',
 
     # Choose your license
@@ -41,7 +41,10 @@ setup(
         'Programming Language :: Python :: 3.1',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
-        'Topic :: Desktop Environment',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 
     keywords=['py3status', 'i3'],
