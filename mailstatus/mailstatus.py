@@ -99,25 +99,22 @@ class Data:
 
         last_state = self.mbox_state[:]
         unread_per_box = self.unread[:]
-        ct = 0
-        for mbox in self.mboxes:
+        for i, mbox in enumerate(self.mboxes):
             mbox.keys()
-            self.mbox_state[ct] = mbox._toc
-            if self.mbox_state[ct] == last_state[ct]:
+            self.mbox_state[i] = mbox._toc
+            if self.mbox_state[i] == last_state[i]:
                 pass
             else:
-                unread_per_box[ct] = 0
+                unread_per_box[i] = 0
                 if isinstance(mbox, Maildir):
-                    unread_per_box[ct] = self._get_unread_maildir(mbox)
+                    unread_per_box[i] = self._get_unread_maildir(mbox)
                 else:
                     for message in mbox:
                         flags = message.get_flags()
                         if 'S' not in flags:
-                            unread_per_box[ct] += 1
-            ct += 1
-        for mail in unread_per_box:
-            unread_mails += mail
+                            unread_per_box[i] += 1
         self.unread = unread_per_box
+        unread_mails = sum(unread_per_box)
 
         return unread_mails
 
