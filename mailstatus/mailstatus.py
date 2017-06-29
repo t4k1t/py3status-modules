@@ -29,7 +29,6 @@ from time import time
 
 
 class MailstatusException(Exception):
-
     """Custom mailstatus exception."""
 
     def __init__(self, exception):
@@ -42,7 +41,6 @@ class MailstatusException(Exception):
 
 
 class Data:
-
     """Aquire data."""
 
     def __init__(self, mailboxes):
@@ -120,7 +118,6 @@ class Data:
 
 
 class Py3status:
-
     """This is where all the py3status magic happens."""
 
     cache_timeout = 10

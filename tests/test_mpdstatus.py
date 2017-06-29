@@ -22,7 +22,6 @@ def command_error(*args, **kwargs):
 
 @pytest.mark.skipif(not MPD, reason="requires python-mpd2")
 class TestData:
-
     """Test Data class."""
 
     @mock.patch('mpd.MPDClient.connect', side_effect=command_error)

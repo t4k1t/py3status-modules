@@ -34,7 +34,6 @@ from dbus.mainloop.glib import DBusGMainLoop
 
 
 class BatteryInfo(object):
-
     """Base class containing battery info."""
 
     def __init__(self, present=True, state="unknown", percentage=0, time=0):
@@ -46,7 +45,6 @@ class BatteryInfo(object):
 
 
 class Data:
-
     """Aquire data."""
 
     dbus_service = 'org.freedesktop.UPower'
@@ -137,7 +135,6 @@ class Data:
 
 
 class Py3status:
-
     """This is where all the py3status magic happens."""
 
     cache_timeout = 0

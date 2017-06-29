@@ -27,7 +27,6 @@ from time import time
 
 
 class TaskstatusException(Exception):
-
     """Custom taskstatus exception."""
 
     def __init__(self, exception):
@@ -40,7 +39,6 @@ class TaskstatusException(Exception):
 
 
 class Data:
-
     """Aquire data."""
 
     def __init__(self):
@@ -69,7 +67,6 @@ class Data:
 
 
 class Py3status:
-
     """Called by py3status."""
 
     cache_timeout = 0

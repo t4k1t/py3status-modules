@@ -30,7 +30,6 @@ from mpd import MPDClient, CommandError
 
 
 class MPDstatusException(Exception):
-
     """Custom mpdstatus exception."""
 
     def __init__(self, exception):
@@ -43,7 +42,6 @@ class MPDstatusException(Exception):
 
 
 class Data:
-
     """Aquire data."""
 
     def __init__(self, host, port, password, max_length):
@@ -133,7 +131,6 @@ class Data:
 
 
 class Py3status:
-
     """This is where all the py3status magic happens."""
 
     cache_timeout = 0

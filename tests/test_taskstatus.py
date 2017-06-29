@@ -6,7 +6,6 @@ from taskstatus.taskstatus import Data
 
 
 class TestData:
-
     """Test Data functions."""
 
     def test_no_open_tasks(self, monkeypatch):

@@ -28,7 +28,6 @@ from time import time
 
 
 class AlsastatusException(Exception):
-
     """Custom taskstatus exception."""
 
     def __init__(self, exception):
@@ -41,7 +40,6 @@ class AlsastatusException(Exception):
 
 
 class Data:
-
     """Aquire data."""
 
     def __init__(self, mixer='Master'):
@@ -130,7 +128,6 @@ class Data:
 
 
 class Py3status:
-
     """This is where all the py3status magic happens."""
 
     cache_timeout = 0

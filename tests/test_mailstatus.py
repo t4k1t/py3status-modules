@@ -5,7 +5,6 @@ from mailstatus.mailstatus import Data, MailstatusException
 
 
 class TestData:
-
     """Test Data functions."""
 
     def test_maildir_unread(self, maildir_new_mail):
