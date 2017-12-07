@@ -13,3 +13,6 @@ _coverage
 
 # documentation
 docs/_build/*
+
+# mypy
+.mypy_cache
